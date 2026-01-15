@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Planner 2026 Cloud</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #fdfbf5; margin: 0; padding: 20px; color: #4a4a4a; }
+        .container { max-width: 800px; margin: 0 auto; }
+        h1 { text-align: center; color: #555; font-weight: 300; }
+        .loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.8); display: none; justify-content: center; align-items: center; z-index: 1000; flex-direction: column; }
+        
+        /* Stile Categorie */
+        .category { margin-bottom: 15px; border-radius: 15px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        h2 { margin: 0; padding: 15px; cursor: pointer; font-size: 1.1em; display: flex; justify-content: space-between; }
+        
+        /* Colori richiesti */
+        .cat-salute { background: #f0e3cf; }
+        .cat-vita { background: #e2ded6; }
+        .cat-acquisti { background: #d9e2d0; }
+        .cat-lifestyle { background: #f5f2e7; }
+        .cat-viaggi { background: #fef7e5; }
+        .cat-eventi { background: #e3e7de; }
+        .cat-libero { background: #fdf9f0; }
+
+        .content { display: none; padding: 10px; background: white; }
+        .sub-cat { margin-left: 10px; border-left: 2px solid #eee; padding-left: 10px; margin-bottom: 10px; }
+        h3 { font-size: 1em; color: #777; margin-bottom: 5px; }
+        
+        .item { display: flex; align-items: center; padding: 5px 0; border-bottom: 1px solid #fafafa; }
+        .item input[type="checkbox"] { margin-right: 10px; transform: scale(1.2); }
+        .item-text { flex-grow: 1; }
+        .item-text.done { text-decoration: line-through; color: #ccc; }
+
+        button.save-btn { position: fixed; bottom: 20px; right: 20px; padding: 15px 25px; border-radius: 50px; border: none; background: #4a4a4a; color: white; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+    </style>
+</head>
+<body>
+
+<div id="loading" class="loading-overlay"><div>Caricamento...</div></div>
+
+<div class="container">
+    <h1>I Miei Obiettivi 2026 ☁️</h1>
+    <div id="planner"></div>
+</div>
+
+<button class="save-btn" onclick="salvaDati()">💾 Salva Modifiche</button>
+
+<script>
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzf2V7uR83vAiSN4kMm4IWuSokQG1p8vq9ULZ8rP9KhkJGdrZDW22iR7k0fkMWIp61vdQ/exec";
+
+// Dati iniziali (quelli che mi hai dato tu)
+let plannerData = [
+    { cat: "Salute", color: "salute", sub: [
+        { title: "Visite Mediche", items: ["Dentista", "Controllo Vista", "Analisi Sangue"] },
+        { title: "Sport", items: ["Yoga 2 volte a settimana", "Passeggiata 30 min"] }
+    ]},
+    { cat: "Stile di Vita", color: "lifestyle", sub: [
+        { title: "Casa", items: ["Decluttering armadio", "Cambio tende"] }
+    ]}
+    // ... ne aggiungerai altri tu premendo i tasti nell'app
+];
+
+async function caricaDati() {
+    document.getElementById('loading').style.display = 'flex';
+    try {
+        const response = await fetch(WEB_APP_URL);
+        const data = await response.json();
+        if (data && data.length > 0) {
+            plannerData = data;
+        }
+    } catch (e) {
+        console.log("Inizializzazione nuovo database");
+    }
+    renderizza();
+    document.getElementById('loading').style.display = 'none';
+}
+
+async function salvaDati() {
+    document.getElementById('loading').style.display = 'flex';
+    try {
+        await fetch(WEB_APP_URL, {
+            method: 'POST',
+            mode: 'no-cors',
+            body: JSON.stringify(plannerData)
+        });
+        alert("Salvato correttamente nel Cloud!");
+    } catch (e) {
+        alert("Errore nel salvataggio");
+    }
+    document.getElementById('loading').style.display = 'none';
+}
+
+function renderizza() {
+    const container = document.getElementById('planner');
+    container.innerHTML = plannerData.map((c, cIdx) => `
+        <div class="category">
+            <h2 class="cat-${c.color}" onclick="toggle(${cIdx})">${c.cat} <span>+</span></h2>
+            <div class="content" id="cat-${cIdx}">
+                ${c.sub.map((s, sIdx) => `
+                    <div class="sub-cat">
+                        <h3>${s.title}</h3>
+                        ${s.items.map((it, iIdx) => `
+                            <div class="item">
+                                <input type="checkbox" onchange="toggleCheck(${cIdx}, ${sIdx}, ${iIdx})">
+                                <span class="item-text">${it}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                `).join('')}
+            </div>
+        </div>
+    `).join('');
+}
+
+function toggle(idx) {
+    const el = document.getElementById(`cat-${idx}`);
+    el.style.display = el.style.display === 'block' ? 'none' : 'block';
+}
+
+function toggleCheck(c, s, i) {
+    // Qui aggiungeremo la logica per barrare le cose, ma intanto vediamo se carica!
+}
+
+caricaDati();
+</script>
+</body>
+</html>
