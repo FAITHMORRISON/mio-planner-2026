@@ -62,11 +62,32 @@ input[type="checkbox"] { margin-right:6px; }
 .add-item-btn:hover { background:#bfcfc4; }
 .delete-item-btn { margin-left:5px; font-size:11px; padding:2px 6px; background:#f4b4b4; }
 .delete-item-btn:hover { background:#f09999; }
+/* Stile per il pulsante Nuvoletta */
+.sync-btn { 
+  position: fixed; 
+  bottom: 20px; 
+  right: 20px; 
+  padding: 15px; 
+  border-radius: 50%; 
+  background: #4a4a4a; 
+  color: white; 
+  border: none; 
+  cursor: pointer; 
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2); 
+  z-index: 1000; 
+  font-size: 20px;
+  line-height: 1;
+}
+.sync-btn:hover { 
+  background: #333; 
+  transform: scale(1.1);
+}
 </style>
 </head>
 <body>
 
 <h1>Planner Obiettivi 2026 - Zen Colorato</h1>
+<button class="sync-btn" onclick="salvaSuCloud()" title="Salva tutto sul Cloud">☁️</button>
 <div id="planner"></div>
 
 <script>
