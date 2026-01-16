@@ -1,73 +1,275 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Planner Faith 2026</title>
-    <style>
-        body { font-family: sans-serif; background: #fdfbf5; padding: 20px; color: #4a4a4a; }
-        h1 { text-align: center; color: #555; }
-        .sezione { background: #f0e3cf; margin: 10px 0; padding: 15px; border-radius: 10px; cursor: pointer; font-weight: bold; border: 1px solid #ddd; }
-        .sotto-sezione { background: #e2ded6; margin: 5px 0 5px 20px; padding: 10px; border-radius: 8px; cursor: pointer; font-size: 0.9em; }
-        .contenuto { display: none; padding: 10px; margin-left: 30px; border-left: 2px solid #ccc; }
-        .visibile { display: block; }
-        li { margin-bottom: 5px; list-style-type: none; }
-        .spunta { margin-right: 10px; }
-    </style>
+<meta charset="UTF-8">
+<title>Planner Obiettivi 2026 - Zen Colorato</title>
+<style>
+body {
+  font-family: Arial, sans-serif;
+  background:#fdfbf5;
+  margin:20px;
+  color:#4a4a4a;
+}
+h1 {
+  text-align:center;
+  margin-bottom:30px;
+  color:#555;
+}
+/* Macro headers */
+h2,h3,h4,h5 {
+  cursor:pointer;
+  padding:8px 12px;
+  border-radius:10px;
+  margin:6px 0;
+  transition: all 0.2s ease;
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+}
+h2:hover, h3:hover, h4:hover, h5:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+/* Colori macro categorie */
+h2[data-color="salute"] { background:#f0e3cf; color:#4a4a4a; } /* sabbia */
+h2[data-color="vita"] { background:#e2ded6; color:#4a4a4a; } /* grigio caldo */
+h2[data-color="acquisti"] { background:#d9e2d0; color:#4a4a4a; } /* salvia chiaro */
+h2[data-color="lifestyle"] { background:#f5f2e7; color:#4a4a4a; } /* beige neutro */
+h2[data-color="viaggi"] { background:#fef7e5; color:#4a4a4a; } /* crema dorata */
+h2[data-color="eventi"] { background:#e3e7de; color:#4a4a4a; } /* grigio-verde tenue */
+h2[data-color="libero"] { background:#fdf9f0; color:#4a4a4a; } /* avorio */
+/* Livelli inferiori */
+h3 { background:#e0d8c4; margin-left:15px; color:#3c3c3c; }
+h4 { background:#d0dec4; margin-left:30px; color:#3c3c3c; }
+h5 { background:#f0efe5; margin-left:45px; color:#3c3c3c; }
+ul { list-style:none; padding-left:20px; margin:2px 0; }
+.collapsible-content { display:none; margin-left:10px; }
+li { padding:4px 0; display:flex; align-items:center; flex-wrap: wrap; }
+button {
+  margin-left:6px;
+  padding:3px 8px;
+  font-size:12px;
+  border-radius:5px;
+  border:none;
+  background:#e6e2d3;
+  cursor:pointer;
+  transition: all 0.2s ease;
+}
+button:hover { background:#d9d4c5; }
+input[type="checkbox"] { margin-right:6px; }
+.note { font-style:italic; color:#666; margin-left:12px; }
+.date { color:#3a7dcb; margin-left:10px; }
+.flag { font-weight:bold; margin-left:10px; cursor:pointer; }
+.add-item-btn { margin-left:10px; font-size:11px; padding:2px 6px; background:#cfd8d2; }
+.add-item-btn:hover { background:#bfcfc4; }
+.delete-item-btn { margin-left:5px; font-size:11px; padding:2px 6px; background:#f4b4b4; }
+.delete-item-btn:hover { background:#f09999; }
+</style>
 </head>
 <body>
 
-    <h1>Planner Obiettivi 2026</h1>
+<h1>Planner Obiettivi 2026 - Zen Colorato</h1>
+<div id="planner"></div>
 
-    <div class="sezione" onclick="toggle(this)">❤️ Salute & Corpo</div>
-    <div class="contenuto">
-        <div class="sotto-sezione" onclick="toggle(this)">⚕️ Visite Mediche</div>
-        <div class="contenuto">
-            <ul>
-                <li>• Gastroenterologo (Ortona - Referto ASL)</li>
-                <li>• Ginecologo (Moncelli, Cortesi, Mautone)</li>
-                <li>• Endocrinologo (9 Marzo - Atri)</li>
-                <li>• Urologo / Ematologo</li>
-            </ul>
-        </div>
-        <div class="sotto-sezione" onclick="toggle(this)">✨ Estetica & Cura</div>
-        <div class="contenuto">
-            <ul>
-                <li>• Capelli: Percorso biondo e sano</li>
-                <li>• Viso: Filler (Dott.ssa Valentina)</li>
-                <li>• Epilazione: Seta Beauty / Arisia</li>
-            </ul>
-        </div>
-    </div>
+<script>
+// ==================== Planner completo ====================
+let planner = [
+  { titolo:"❤️ Salute & Corpo", colore:"salute",
+    sottoCategorie:[
+      { titolo:"Visite mediche",
+        sottoCategorie:[
+          { titolo:"Gastroenterologo (Ortona)", obiettivi:["Controllo referto online ASL Abruzzo","Telefonata per risultati","Ricerca / lista gastroenterologi","Note e referti"] },
+          { titolo:"Ginecologo", sottoCategorie:[
+              { titolo:"Ricerca specialista", obiettivi:["Michele Moncelli","Marina Cortesi","Daniele Mautone (Artemisia)","Carlo De Cicco","Massimiliano Marziali","Manuel Ianieri"] },
+              { titolo:"Temi da approfondire", obiettivi:["Endometriosi","Insulino-resistenza","Terapia ormonale (valutazioni)","Dieta per endometriosi","Fertilità / salute ovarica"] },
+              { titolo:"Esami da discutere", obiettivi:["Trombofilia (pre-terapia ormonale)","Risonanza magnetica pelvica","Marker ovarici CA125"] },
+              { titolo:"Note post-visita", obiettivi:[] },
+              { titolo:"Referti", obiettivi:["Contattare ASL Lazio – esito HPV test"] }
+          ]},
+          { titolo:"Urologo", obiettivi:["Calcolo renale","Esami / indicazioni"] },
+          { titolo:"Ematologo / Genetista", obiettivi:["Esami genetici trombofilia","Familiarità"] },
+          { titolo:"Endocrinologo", obiettivi:["Visita Ospedale di Atri","Data: 9 marzo"] },
+          { titolo:"Dermatologo", obiettivi:["Bolle cutanee ricorrenti","Diagnosi / terapia"] },
+          { titolo:"Senologia", obiettivi:["Prima ecografia senologica","Prenotazione entro l’anno"] },
+          { titolo:"Psicoterapia", obiettivi:["Ricerca psicoterapeuta","Bonus psicologico","Avvio percorso terapeutico","Lista esperti / professionisti"] }
+        ]
+      },
+      { titolo:"Analisi ed esami", obiettivi:["Ferro e ferritina","Marker ovarici CA125","Risonanza magnetica pelvica","Esami trombofilia"] },
+      { titolo:"Fisioterapia & Movimento", sottoCategorie:[
+        { titolo:"Fisioterapia prescritta dal fisiatra", obiettivi:["Inizio: febbraio","Ricerca fisioterapisti / centri"] },
+        { titolo:"Posturale", obiettivi:["Flag","Nota","Data"] },
+        { titolo:"Ripresa attività sportiva", obiettivi:["Flag","Nota","Data"] },
+        { titolo:"Obiettivo fine anno", obiettivi:["Tonificazione e miglioramento fisico"] }
+      ]},
+      { titolo:"Estetica & Cura del corpo", sottoCategorie:[
+        { titolo:"Capelli", obiettivi:["Ricerca salone fidato a Roma","Percorso di cura graduale","Tornare bionda, capelli lunghi e sani"] },
+        { titolo:"Viso", obiettivi:["Filler di rinfresco","Ricerca medici specialisti","Riferimento: Dott.ssa Valentina (Pescara)"] },
+        { titolo:"Epilazione", obiettivi:["Contattare SETA Beauty Tiburtina","Laser corpo 2026","Prenotazioni Arisia ogni ~40 giorni"] },
+        { titolo:"Occhi", obiettivi:["Cambio montatura","Occhiali nuovi"] }
+      ]},
+      { titolo:"Integratori", obiettivi:["Normocis 400 / Normocis INO 400","Swiss Capelli Sublimi"] }
+  ]},
+  { titolo:"📅 Vita pratica & Scadenze", colore:"vita",
+    sottoCategorie:[
+      { titolo:"Abbonamenti & digitale", obiettivi:["Benzina Enilive (sconto gennaio)","Chat Apple – info backup","Riduzione iCloud (entro 13 gennaio)","Backup file su KDrive"] },
+      { titolo:"Vendite", obiettivi:["iPhone 14 Pro"] },
+      { titolo:"Concorsi pubblici", obiettivi:["Agenzia delle Entrate","INPS (448 posti)","Comune di Roma (31 posti)","Guardia di Finanza","Corte dei Conti","Ufficio delle Dogane (1500)","MIC – Scadenza iscrizioni: entro 10 gennaio"] },
+      { titolo:"Documenti", obiettivi:["Rinnovo patente (entro marzo)"] },
+      { titolo:"Casa", obiettivi:["Ricerca casa nuova","Scadenze e bollette – Spazio aggiornabile"] }
+  ]},
+  { titolo:"🛍️ Acquisti & Outfit", colore:"acquisti",
+    sottoCategorie:[
+      { titolo:"Acquisti graduali 2026", obiettivi:[] },
+      { titolo:"Cura capelli", obiettivi:["Ricerca spazzole, fon dedicati","Ricerca saloni per nuovo look biondo"] },
+      { titolo:"Lista spesa / acquisti volatili", obiettivi:[] },
+      { titolo:"Planner libero", obiettivi:[] }
+  ]},
+  { titolo:"🎨 Lifestyle / Hobby / Crescita personale", colore:"lifestyle",
+    sottoCategorie:[
+      { titolo:"Confini personali", obiettivi:["Eliminare persone nocive / deludenti"] },
+      { titolo:"Scuole / attività", obiettivi:["Motocross (entro 2026)"] },
+      { titolo:"VHS / Digitalizzazione famiglia", obiettivi:[] },
+      { titolo:"Studio / approfondimento", obiettivi:["AI","ML","Arte generativa / procedurale"] },
+      { titolo:"Eventi / mostre / concerti", obiettivi:[] }
+  ]},
+  { titolo:"✈️ Viaggi / Luoghi", colore:"viaggi",
+    sottoCategorie:[
+      { titolo:"Torino", obiettivi:[] },
+      { titolo:"Festival della luce – Barcellona (febbraio)", obiettivi:[] },
+      { titolo:"Abruzzo", obiettivi:["Ortona","Chieti","Museo Barbella","Museo Archeologico"] }
+  ]},
+  { titolo:"🎭 Eventi culturali", colore:"eventi",
+    sottoCategorie:[
+      { titolo:"Mostre", obiettivi:[] },
+      { titolo:"Concerti", obiettivi:[] },
+      { titolo:"Eventi da aggiungere", obiettivi:[] }
+  ]},
+  { titolo:"🧭 PLANNER LIBERO", colore:"libero",
+    sottoCategorie:[
+      { titolo:"Spazio aperto", obiettivi:[] },
+      { titolo:"Appunti non categorizzati", obiettivi:[] },
+      { titolo:"Idee future", obiettivi:[] },
+      { titolo:"Pensieri in evoluzione", obiettivi:[] }
+  ]}
+];
 
-    <div class="sezione" onclick="toggle(this)">📅 Vita Pratica & Concorsi</div>
-    <div class="contenuto">
-        <ul>
-            <li>• Concorso MIC (Scadenza 10 Gennaio)</li>
-            <li>• Concorsi Agenzia Entrate / INPS / Roma</li>
-            <li>• Rinnovo Patente (Entro Marzo)</li>
-            <li>• iCloud e Backup (13 Gennaio)</li>
-        </ul>
-    </div>
+// ==================== Funzioni ====================
 
-    <div class="sezione" onclick="toggle(this)">✈️ Viaggi & Shopping</div>
-    <div class="contenuto">
-        <ul>
-            <li>• Barcellona (Febbraio - Festival Luce)</li>
-            <li>• Torino</li>
-            <li>• Abruzzo (Musei Chieti e Ortona)</li>
-            <li>• Shopping: Spazzole e Phon dedicati</li>
-        </ul>
-    </div>
+// Carica da localStorage se presente
+if(localStorage.getItem('planner')) {
+  try { planner = JSON.parse(localStorage.getItem('planner')); } catch(e){ console.error(e); }
+}
 
-    <script>
-        function toggle(elemento) {
-            const prossimo = elemento.nextElementSibling;
-            if (prossimo && prossimo.classList.contains('contenuto')) {
-                prossimo.classList.toggle('visibile');
-            }
+// Salva planner
+function salvaPlanner() { localStorage.setItem('planner', JSON.stringify(planner)); }
+
+// Funzione ricorsiva
+function creaListaRec(arr, container, livello=2, path=[]){
+  arr.forEach((item,i)=>{
+    const currentPath = [...path, i];
+
+    const h = document.createElement('h'+livello);
+    h.textContent = item.titolo;
+    if(livello===2 && item.colore) h.dataset.color = item.colore;
+    h.classList.add('collapsible');
+    container.appendChild(h);
+
+    const ul = document.createElement('ul');
+    ul.classList.add('collapsible-content');
+
+    // Obiettivi
+    (item.obiettivi||[]).forEach((objText,j)=>{
+      const li = document.createElement('li');
+      const checkbox = document.createElement('input');
+      checkbox.type='checkbox';
+      li.appendChild(checkbox);
+      li.appendChild(document.createTextNode(' ' + objText));
+
+      // Nota
+      const btnNote = document.createElement('button');
+      btnNote.textContent='+ Nota';
+      btnNote.onclick=()=>{ 
+        const nota = prompt('Inserisci nota:'); 
+        if(nota){ 
+          const span = document.createElement('span');
+          span.textContent=' — ' + nota;
+          span.className='note';
+          li.appendChild(span);
         }
-        console.log("Planner caricato correttamente.");
-    </script>
+      };
+      li.appendChild(btnNote);
+
+      // Data
+      const btnDate = document.createElement('button');
+      btnDate.textContent='📅';
+      btnDate.onclick=()=>{ 
+        const data = prompt('Inserisci data/ora:'); 
+        if(data){
+          const span = document.createElement('span');
+          span.textContent=' — ' + data;
+          span.className='date';
+          li.appendChild(span);
+        }
+      };
+      li.appendChild(btnDate);
+
+      // Flag
+      const btnFlag = document.createElement('span');
+      btnFlag.textContent='🔴';
+      btnFlag.className='flag';
+      btnFlag.onclick=()=>{ btnFlag.textContent = btnFlag.textContent==='🔴' ? '✅' : '🔴'; };
+      li.appendChild(btnFlag);
+
+      // Delete
+      const btnDel = document.createElement('button');
+      btnDel.textContent='Elimina';
+      btnDel.className='delete-item-btn';
+      btnDel.onclick=()=>{
+        item.obiettivi.splice(j,1);
+        salvaPlanner();
+        container.innerHTML=''; 
+        creaListaRec(planner, plannerDiv);
+      };
+      li.appendChild(btnDel);
+
+      ul.appendChild(li);
+    });
+
+    // Pulsante aggiungi
+    const btnAdd = document.createElement('button');
+    btnAdd.textContent='+ Aggiungi';
+    btnAdd.className='add-item-btn';
+    btnAdd.onclick=()=>{
+      const nuovo = prompt('Inserisci nuovo elemento:');
+      if(nuovo){
+        item.obiettivi = item.obiettivi || [];
+        item.obiettivi.push(nuovo);
+        salvaPlanner();
+        container.innerHTML='';
+        creaListaRec(planner, plannerDiv);
+      }
+    };
+    ul.appendChild(btnAdd);
+
+    // SottoCategorie
+    if(item.sottoCategorie) creaListaRec(item.sottoCategorie, ul, livello+1, currentPath);
+
+    container.appendChild(ul);
+  });
+}
+
+// ==================== Inizializzazione ====================
+const plannerDiv = document.getElementById('planner');
+creaListaRec(planner, plannerDiv);
+
+// ==================== Collapsible ====================
+document.addEventListener('click', e=>{
+  if(e.target.classList.contains('collapsible')){
+    const nextUl = e.target.nextElementSibling;
+    if(nextUl && nextUl.classList.contains('collapsible-content')){
+      nextUl.style.display = nextUl.style.display==='block' ? 'none' : 'block';
+    }
+  }
+});
+</script>
+
 </body>
 </html>
