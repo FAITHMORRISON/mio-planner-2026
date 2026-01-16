@@ -1,219 +1,32 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-<meta charset="UTF-8">
-<title>Planner Obiettivi 2026 - Zen Colorato</title>
-<style>
-body { font-family: Arial, sans-serif; background:#fdfbf5; margin:20px; color:#4a4a4a; }
-h1 { text-align:center; margin-bottom:30px; color:#555; }
-h2,h3,h4,h5 { cursor:pointer; padding:8px 12px; border-radius:10px; margin:6px 0; transition: all 0.2s ease; border-bottom: 1px solid rgba(0,0,0,0.05); }
-h2:hover, h3:hover, h4:hover, h5:hover { transform: translateY(-1px); box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
-h2[data-color="salute"] { background:#f0e3cf; color:#4a4a4a; }
-h2[data-color="vita"] { background:#e2ded6; color:#4a4a4a; }
-h2[data-color="acquisti"] { background:#d9e2d0; color:#4a4a4a; }
-h2[data-color="lifestyle"] { background:#f5f2e7; color:#4a4a4a; }
-h2[data-color="viaggi"] { background:#fef7e5; color:#4a4a4a; }
-h2[data-color="eventi"] { background:#e3e7de; color:#4a4a4a; }
-h2[data-color="libero"] { background:#fdf9f0; color:#4a4a4a; }
-h3 { background:#e0d8c4; margin-left:15px; color:#3c3c3c; }
-h4 { background:#d0dec4; margin-left:30px; color:#3c3c3c; }
-h5 { background:#f0efe5; margin-left:45px; color:#3c3c3c; }
-ul { list-style:none; padding-left:20px; margin:2px 0; }
-.collapsible-content { display:none; margin-left:10px; }
-li { padding:4px 0; display:flex; align-items:center; flex-wrap: wrap; }
-button { margin-left:6px; padding:3px 8px; font-size:12px; border-radius:5px; border:none; background:#e6e2d3; cursor:pointer; transition: all 0.2s ease; }
-button:hover { background:#d9d4c5; }
-input[type="checkbox"] { margin-right:6px; }
-.note { font-style:italic; color:#666; margin-left:12px; }
-.date { color:#3a7dcb; margin-left:10px; }
-.flag { font-weight:bold; margin-left:10px; cursor:pointer; }
-.add-item-btn { margin-left:10px; font-size:11px; padding:2px 6px; background:#cfd8d2; }
-.delete-item-btn { margin-left:5px; font-size:11px; padding:2px 6px; background:#f4b4b4; }
-/* Bottoni Sincronizzazione */
-.sync-btn { position: fixed; bottom: 20px; right: 20px; padding: 15px; border-radius: 50%; background: #4a4a4a; color: white; border: none; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.2); z-index: 1000; font-size: 20px; }
-.overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.8); display: none; justify-content: center; align-items: center; z-index: 2000; }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Planner 2026</title>
+    <style>
+        body { font-family: sans-serif; background: #fdfbf5; padding: 20px; }
+        h1 { color: #555; text-align: center; }
+        .categoria { background: #f0e3cf; margin: 10px 0; padding: 15px; border-radius: 10px; cursor: pointer; }
+        .contenuto { display: none; padding: 10px; }
+        .visibile { display: block; }
+    </style>
 </head>
 <body>
+    <h1>Mio Planner 2026</h1>
+    <div class="categoria" onclick="this.nextElementSibling.classList.toggle('visibile')">
+        ❤️ Salute & Corpo (Clicca per aprire)
+    </div>
+    <div class="contenuto">
+        <ul>
+            <li>Gastroenterologo</li>
+            <li>Ginecologo</li>
+            <li>Analisi ed esami</li>
+        </ul>
+    </div>
 
-<div id="loader" class="overlay">Sincronizzazione Cloud in corso...</div>
-<h1>Planner Obiettivi 2026 - Zen Colorato</h1>
-<div id="planner"></div>
-<button class="sync-btn" onclick="salvaSuCloud()" title="Salva tutto">☁️</button>
-
-<script>
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzf2V7uR83vAiSN4kMm4IWuSokQG1p8vq9ULZ8rP9KhkJGdrZDW22iR7k0fkMWIp61vdQ/exec";
-
-let planner = [
-  { titolo:"❤️ Salute & Corpo", colore:"salute",
-    sottoCategorie:[
-      { titolo:"Visite mediche",
-        sottoCategorie:[
-          { titolo:"Gastroenterologo (Ortona)", obiettivi:["Controllo referto online ASL Abruzzo","Telefonata per risultati","Ricerca / lista gastroenterologi","Note e referti"] },
-          { titolo:"Ginecologo", sottoCategorie:[
-              { titolo:"Ricerca specialista", obiettivi:["Michele Moncelli","Marina Cortesi","Daniele Mautone (Artemisia)","Carlo De Cicco","Massimiliano Marziali","Manuel Ianieri"] },
-              { titolo:"Temi da approfondire", obiettivi:["Endometriosi","Insulino-resistenza","Terapia ormonale (valutazioni)","Dieta per endometriosi","Fertilità / salute ovarica"] },
-              { titolo:"Esami da discutere", obiettivi:["Trombofilia (pre-terapia ormonale)","Risonanza magnetica pelvica","Marker ovarici CA125"] },
-              { titolo:"Note post-visita", obiettivi:[] },
-              { titolo:"Referti", obiettivi:["Contattare ASL Lazio – esito HPV test"] }
-          ]},
-          { titolo:"Urologo", obiettivi:["Calcolo renale","Esami / indicazioni"] },
-          { titolo:"Ematologo / Genetista", obiettivi:["Esami genetici trombofilia","Familiarità"] },
-          { titolo:"Endocrinologo", obiettivi:["Visita Ospedale di Atri","Data: 9 marzo"] },
-          { titolo:"Dermatologo", obiettivi:["Bolle cutanee ricorrenti","Diagnosi / terapia"] },
-          { titolo:"Senologia", obiettivi:["Prima ecografia senologica","Prenotazione entro l’anno"] },
-          { titolo:"Psicoterapia", obiettivi:["Ricerca psicoterapeuta","Bonus psicologico","Avvio percorso terapeutico","Lista esperti / professionisti"] }
-        ]
-      },
-      { titolo:"Analisi ed esami", obiettivi:["Ferro e ferritina","Marker ovarici CA125","Risonanza magnetica pelvica","Esami trombofilia"] },
-      { titolo:"Fisioterapia & Movimento", sottoCategorie:[
-        { titolo:"Fisioterapia prescritta dal fisiatra", obiettivi:["Inizio: febbraio","Ricerca fisioterapisti / centri"] },
-        { titolo:"Posturale", obiettivi:["Esercizi"] },
-        { titolo:"Ripresa attività sportiva", obiettivi:["Palestra"] },
-        { titolo:"Obiettivo fine anno", obiettivi:["Tonificazione e miglioramento fisico"] }
-      ]},
-      { titolo:"Estetica & Cura del corpo", sottoCategorie:[
-        { titolo:"Capelli", obiettivi:["Ricerca salone fidato a Roma","Percorso di cura graduale","Tornare bionda, capelli lunghi e sani"] },
-        { titolo:"Viso", obiettivi:["Filler di rinfresco","Ricerca medici specialisti","Riferimento: Dott.ssa Valentina (Pescara)"] },
-        { titolo:"Epilazione", obiettivi:["Contattare SETA Beauty Tiburtina","Laser corpo 2026","Prenotazioni Arisia ogni ~40 giorni"] },
-        { titolo:"Occhi", obiettivi:["Cambio montatura","Occhiali nuovi"] }
-      ]},
-      { titolo:"Integratori", obiettivi:["Normocis 400 / Normocis INO 400","Swiss Capelli Sublimi"] }
-  ]},
-  { titolo:"📅 Vita pratica & Scadenze", colore:"vita",
-    sottoCategorie:[
-      { titolo:"Abbonamenti & digitale", obiettivi:["Benzina Enilive (sconto gennaio)","Chat Apple – info backup","Riduzione iCloud (entro 13 gennaio)","Backup file su KDrive"] },
-      { titolo:"Vendite", obiettivi:["iPhone 14 Pro"] },
-      { titolo:"Concorsi pubblici", obiettivi:["Agenzia delle Entrate","INPS (448 posti)","Comune di Roma (31 posti)","Guardia di Finanza","Corte dei Conti","Ufficio delle Dogane (1500)","MIC – Scadenza iscrizioni: entro 10 gennaio"] },
-      { titolo:"Documenti", obiettivi:["Rinnovo patente (entro marzo)"] },
-      { titolo:"Casa", obiettivi:["Ricerca casa nuova","Scadenze e bollette – Spazio aggiornabile"] }
-  ]},
-  { titolo:"🛍️ Acquisti & Outfit", colore:"acquisti",
-    sottoCategorie:[
-      { titolo:"Acquisti graduali 2026", obiettivi:[] },
-      { titolo:"Cura capelli", obiettivi:["Ricerca spazzole, fon dedicati","Ricerca saloni per nuovo look biondo"] },
-      { titolo:"Lista spesa / acquisti volatili", obiettivi:[] },
-      { titolo:"Planner libero", obiettivi:[] }
-  ]},
-  { titolo:"🎨 Lifestyle / Hobby / Crescita personale", colore:"lifestyle",
-    sottoCategorie:[
-      { titolo:"Confini personali", obiettivi:["Eliminare persone nocive / deludenti"] },
-      { titolo:"Scuole / attività", obiettivi:["Motocross (entro 2026)"] },
-      { titolo:"VHS / Digitalizzazione famiglia", obiettivi:[] },
-      { titolo:"Studio / approfondimento", obiettivi:["AI","ML","Arte generativa / procedurale"] },
-      { titolo:"Eventi / mostre / concerti", obiettivi:[] }
-  ]},
-  { titolo:"✈️ Viaggi / Luoghi", colore:"viaggi",
-    sottoCategorie:[
-      { titolo:"Torino", obiettivi:[] },
-      { titolo:"Festival della luce – Barcellona (febbraio)", obiettivi:[] },
-      { titolo:"Abruzzo", obiettivi:["Ortona","Chieti","Museo Barbella","Museo Archeologico"] }
-  ]},
-  { titolo:"🎭 Eventi culturali", colore:"eventi",
-    sottoCategorie:[
-      { titolo:"Mostre", obiettivi:[] },
-      { titolo:"Concerti", obiettivi:[] },
-      { titolo:"Eventi da aggiungere", obiettivi:[] }
-  ]},
-  { titolo:"🧭 PLANNER LIBERO", colore:"libero",
-    sottoCategorie:[
-      { titolo:"Spazio aperto", obiettivi:[] },
-      { titolo:"Appunti non categorizzati", obiettivi:[] },
-      { titolo:"Idee future", obiettivi:[] },
-      { titolo:"Pensieri in evoluzione", obiettivi:[] }
-  ]}
-];
-
-async function caricaDaCloud() {
-    document.getElementById('loader').style.display = 'flex';
-    try {
-        const response = await fetch(SCRIPT_URL);
-        const data = await response.json();
-        if (data && Array.isArray(data)) planner = data;
-    } catch (e) { console.log("Errore caricamento Cloud, uso dati predefiniti"); }
-    renderizza();
-    document.getElementById('loader').style.display = 'none';
-}
-
-async function salvaSuCloud() {
-    document.getElementById('loader').style.display = 'flex';
-    try {
-        await fetch(SCRIPT_URL, {
-            method: 'POST',
-            mode: 'no-cors',
-            body: JSON.stringify(planner)
-        });
-        alert("✅ Dati salvati con successo sul Cloud!");
-    } catch (e) { alert("❌ Errore durante il salvataggio"); }
-    document.getElementById('loader').style.display = 'none';
-}
-
-function renderizza() {
-    const plannerDiv = document.getElementById('planner');
-    plannerDiv.innerHTML = '';
-    creaListaRec(planner, plannerDiv);
-}
-
-function creaListaRec(arr, container, livello=2){
-  arr.forEach((item,i)=>{
-    const h = document.createElement('h'+livello);
-    h.textContent = item.titolo;
-    if(livello===2 && item.colore) h.dataset.color = item.colore;
-    h.classList.add('collapsible');
-    container.appendChild(h);
-
-    const ul = document.createElement('ul');
-    ul.classList.add('collapsible-content');
-
-    (item.obiettivi||[]).forEach((obj,j)=>{
-      const li = document.createElement('li');
-      const isObject = typeof obj === 'object';
-      const text = isObject ? obj.text : obj;
-      const done = isObject ? obj.done : false;
-
-      const ck = document.createElement('input');
-      ck.type='checkbox';
-      ck.checked = done;
-      ck.onchange = () => { item.obiettivi[j] = { text: text, done: ck.checked }; };
-
-      li.appendChild(ck);
-      li.appendChild(document.createTextNode(text));
-
-      const btnDel = document.createElement('button');
-      btnDel.textContent='Elimina';
-      btnDel.className='delete-item-btn';
-      btnDel.onclick=()=>{ item.obiettivi.splice(j,1); renderizza(); };
-      
-      li.appendChild(btnDel);
-      ul.appendChild(li);
-    });
-
-    const btnAdd = document.createElement('button');
-    btnAdd.textContent='+ Aggiungi';
-    btnAdd.className='add-item-btn';
-    btnAdd.onclick=()=>{
-      const nuovo = prompt('Inserisci nuovo obiettivo:');
-      if(nuovo){ 
-          if(!item.obiettivi) item.obiettivi = [];
-          item.obiettivi.push({text: nuovo, done: false}); 
-          renderizza(); 
-      }
-    };
-    ul.appendChild(btnAdd);
-
-    if(item.sottoCategorie) creaListaRec(item.sottoCategorie, ul, livello+1);
-    container.appendChild(ul);
-  });
-}
-
-document.addEventListener('click', e=>{
-  if(e.target.classList.contains('collapsible')){
-    const nextUl = e.target.nextElementSibling;
-    if(nextUl) nextUl.style.display = nextUl.style.display==='block' ? 'none' : 'block';
-  }
-});
-
-caricaDaCloud();
-</script>
+    <script>
+        console.log("Il sito funziona correttamente!");
+    </script>
 </body>
 </html>
