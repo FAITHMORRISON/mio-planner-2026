@@ -91,6 +91,19 @@ input[type="checkbox"] { margin-right:6px; }
 <div id="planner"></div>
 
 <script>
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzf2V7uR83vAiSN4kMm4IWuSokQG1p8vq9ULZ8rP9KhkJGdrZDW22iR7k0fkMWIp61vdQ/exec";
+
+async function caricaDaCloud() {
+    try {
+        const response = await fetch(SCRIPT_URL);
+        const data = await response.json();
+        if (data && Array.isArray(data)) {
+            planner = data; // Aggiorna i dati con quelli del foglio Google
+            document.getElementById('planner').innerHTML = ''; // Pulisce il planner
+            creaListaRec(planner, document.getElementById('planner')); // Ridisegna tutto
+        }
+    } catch (e) { console.log("Cloud non disponibile, uso dati locali"); }
+}
 // ==================== Planner completo ====================
 let planner = [
   { titolo:"❤️ Salute & Corpo", colore:"salute",
@@ -290,6 +303,49 @@ document.addEventListener('click', e=>{
     }
   }
 });
+// --- INTEGRAZIONE CLOUD ---
+
+// 1. Definiamo l'URL del tuo database
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzf2V7uR83vAiSN4kMm4IWuSokQG1p8vq9ULZ8rP9KhkJGdrZDW22iR7k0fkMWIp61vdQ/exec";
+
+// 2. Funzione per inviare i dati a Google Sheets (attivata dalla nuvoletta)
+async function salvaSuCloud() {
+    const btn = document.querySelector('.sync-btn');
+    const iconaOriginale = btn.textContent;
+    btn.textContent = "⏳"; 
+    
+    try {
+        await fetch(SCRIPT_URL, {
+            method: 'POST',
+            mode: 'no-cors', 
+            body: JSON.stringify(planner) // Invia la variabile planner che già usi
+        });
+        alert("✅ Sincronizzato con successo su Google Sheets!");
+    } catch (e) { 
+        alert("❌ Errore di connessione al Cloud"); 
+    }
+    btn.textContent = iconaOriginale;
+}
+
+// 3. Funzione per recuperare i dati dal Cloud all'avvio
+async function caricaDaCloud() {
+    try {
+        const response = await fetch(SCRIPT_URL);
+        const data = await response.json();
+        // Se il Cloud ha dati validi, sovrascriviamo quelli locali
+        if (data && Array.isArray(data) && data.length > 0) {
+            planner = data;
+            salvaPlanner(); // Aggiorna anche il tuo localStorage locale
+            plannerDiv.innerHTML = ''; // Pulisce la lista attuale
+            creaListaRec(planner, plannerDiv); // Ridisegna tutto con i dati del Cloud
+        }
+    } catch (e) { 
+        console.log("Cloud vuoto o non raggiungibile, uso dati locali."); 
+    }
+}
+
+// 4. Avviamo il caricamento Cloud automatico
+caricaDaCloud();
 </script>
 
 </body>
