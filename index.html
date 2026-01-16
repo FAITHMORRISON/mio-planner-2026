@@ -303,28 +303,61 @@ document.addEventListener('click', e=>{
     }
   }
 });
+// ... qui finisce il tuo codice originale con le funzioni aggiungi/elimina ...
+
+// ==========================================
+// SVILUPPO CLOUD - INCOLLA DA QUI SOTTO
+// ==========================================
+
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzf2V7uR83vAiSN4kMm4IWuSokQG1p8vq9ULZ8rP9KhkJGdrZDW22iR7k0fkMWIp61vdQ/exec";
+
+async function salvaSuCloud() {
+    console.log("Pulsante cliccato!");
+    const btn = document.querySelector('.sync-btn');
+    btn.textContent = "⏳"; 
+    
+    try {
+        await fetch(SCRIPT_URL, {
+            method: 'POST',
+            mode: 'no-cors', 
+            body: JSON.stringify(planner)
+        });
+        alert("✅ Sincronizzato con successo su Google Sheets!");
+    } catch (e) { 
+        console.error("Errore:", e);
+        alert("❌ Errore durante il salvataggio"); 
+    }
+    btn.textContent = "☁️";
+}
+
 async function caricaDaCloud() {
     try {
         const response = await fetch(SCRIPT_URL);
-        const text = await response.text(); // Leggiamo come testo per sicurezza
+        const text = await response.text();
         
         if (text && text.trim() !== "" && text !== "[]") {
             const data = JSON.parse(text);
             if (Array.isArray(data) && data.length > 0) {
                 planner = data;
-                // Pulisce e ridisegna solo se abbiamo dati reali dal Cloud
-                const pDiv = document.getElementById('planner');
-                pDiv.innerHTML = ''; 
-                creaListaRec(planner, pDiv);
+                const plannerDiv = document.getElementById('planner');
+                plannerDiv.innerHTML = ''; 
+                creaListaRec(planner, plannerDiv);
                 console.log("Dati caricati dal Cloud");
             }
-        } else {
-            console.log("Cloud vuoto, mantengo struttura locale");
         }
     } catch (e) { 
-        console.log("Errore Cloud o Database ancora vuoto: uso dati locali"); 
+        console.log("Database ancora vuoto o errore"); 
     }
 }
+
+// Avvio automatico al caricamento
+window.addEventListener('load', function() {
+    caricaDaCloud();
+});
+
+</script>
+</body>
+</html>
 </script>
 
 </body>
