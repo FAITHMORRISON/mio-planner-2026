@@ -303,61 +303,60 @@ document.addEventListener('click', e=>{
     }
   }
 });
-// ... qui finisce il tuo codice originale con le funzioni aggiungi/elimina ...
-
-// ==========================================
-// SVILUPPO CLOUD - INCOLLA DA QUI SOTTO
-// ==========================================
-
+// 1. IL TUO LINK DATABASE
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzf2V7uR83vAiSN4kMm4IWuSokQG1p8vq9ULZ8rP9KhkJGdrZDW22iR7k0fkMWIp61vdQ/exec";
 
+// 2. I TUOI DATI ORIGINALI (Lasciali qui come "base" sicura)
+// Nota: qui sotto deve esserci la tua variabile let planner = [...]; con tutti i tuoi contenuti.
+// Se l'hai già nel file, assicurati che inizi con "let planner ="
+
+// 3. FUNZIONE PER SALVARE (NUVOLETTA)
 async function salvaSuCloud() {
-    console.log("Pulsante cliccato!");
     const btn = document.querySelector('.sync-btn');
-    btn.textContent = "⏳"; 
-    
+    btn.textContent = "⏳";
     try {
         await fetch(SCRIPT_URL, {
             method: 'POST',
-            mode: 'no-cors', 
-            body: JSON.stringify(planner)
+            mode: 'no-cors',
+            body: JSON.stringify(planner) 
         });
         alert("✅ Sincronizzato con successo su Google Sheets!");
-    } catch (e) { 
-        console.error("Errore:", e);
-        alert("❌ Errore durante il salvataggio"); 
+    } catch (e) {
+        alert("❌ Errore durante il salvataggio");
     }
     btn.textContent = "☁️";
 }
 
+// 4. FUNZIONE PER CARICARE (PRUDENTE)
 async function caricaDaCloud() {
+    const plannerDiv = document.getElementById('planner');
+    
+    // Mostra subito i dati che hai nel file (così il sito NON è vuoto)
+    plannerDiv.innerHTML = '';
+    creaListaRec(planner, plannerDiv);
+
     try {
         const response = await fetch(SCRIPT_URL);
         const text = await response.text();
         
+        // Se il Cloud ha dati veri, allora aggiorna la pagina
         if (text && text.trim() !== "" && text !== "[]") {
             const data = JSON.parse(text);
             if (Array.isArray(data) && data.length > 0) {
                 planner = data;
-                const plannerDiv = document.getElementById('planner');
-                plannerDiv.innerHTML = ''; 
+                plannerDiv.innerHTML = ''; // Pulisce solo ora che abbiamo i dati nuovi
                 creaListaRec(planner, plannerDiv);
-                console.log("Dati caricati dal Cloud");
+                console.log("Dati aggiornati dal Cloud");
             }
         }
-    } catch (e) { 
-        console.log("Database ancora vuoto o errore"); 
+    } catch (e) {
+        console.log("Database vuoto, uso i dati predefiniti");
     }
 }
 
-// Avvio automatico al caricamento
-window.addEventListener('load', function() {
-    caricaDaCloud();
-});
-
-</script>
-</body>
-</html>
+// 5. AVVIO
+// Assicurati che le tue funzioni (salvaPlanner, creaListaRec, ecc.) siano scritte SOPRA o SOTTO questo blocco
+window.onload = caricaDaCloud;
 </script>
 
 </body>
