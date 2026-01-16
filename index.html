@@ -1,112 +1,73 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Planner Obiettivi 2026</title>
-<style>
-body { font-family: Arial, sans-serif; background:#fdfbf5; margin:20px; color:#4a4a4a; }
-h1 { text-align:center; color:#555; }
-h2,h3,h4,h5 { cursor:pointer; padding:8px 12px; border-radius:10px; margin:6px 0; border-bottom: 1px solid rgba(0,0,0,0.05); }
-h2[data-color="salute"] { background:#f0e3cf; }
-h2[data-color="vita"] { background:#e2ded6; }
-h2[data-color="acquisti"] { background:#d9e2d0; }
-h2[data-color="lifestyle"] { background:#f5f2e7; }
-h2[data-color="viaggi"] { background:#fef7e5; }
-h2[data-color="eventi"] { background:#e3e7de; }
-h2[data-color="libero"] { background:#fdf9f0; }
-h3 { background:#e0d8c4; margin-left:15px; }
-h4 { background:#d0dec4; margin-left:30px; }
-h5 { background:#f0efe5; margin-left:45px; }
-ul { list-style:none; padding-left:20px; display:none; }
-.show { display:block; }
-li { padding:4px 0; display:flex; align-items:center; }
-button { margin-left:6px; padding:3px 8px; font-size:12px; border-radius:5px; border:none; background:#e6e2d3; cursor:pointer; }
-.sync-btn { position: fixed; bottom: 20px; right: 20px; padding: 15px; border-radius: 50%; background: #4a4a4a; color: white; border: none; cursor: pointer; font-size: 20px; }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Planner Faith 2026</title>
+    <style>
+        body { font-family: sans-serif; background: #fdfbf5; padding: 20px; color: #4a4a4a; }
+        h1 { text-align: center; color: #555; }
+        .sezione { background: #f0e3cf; margin: 10px 0; padding: 15px; border-radius: 10px; cursor: pointer; font-weight: bold; border: 1px solid #ddd; }
+        .sotto-sezione { background: #e2ded6; margin: 5px 0 5px 20px; padding: 10px; border-radius: 8px; cursor: pointer; font-size: 0.9em; }
+        .contenuto { display: none; padding: 10px; margin-left: 30px; border-left: 2px solid #ccc; }
+        .visibile { display: block; }
+        li { margin-bottom: 5px; list-style-type: none; }
+        .spunta { margin-right: 10px; }
+    </style>
 </head>
 <body>
 
-<h1>Planner Obiettivi 2026 - Zen Colorato</h1>
-<div id="planner"></div>
-<button class="sync-btn" onclick="salvaSuCloud()">☁️</button>
+    <h1>Planner Obiettivi 2026</h1>
 
-<script>
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzf2V7uR83vAiSN4kMm4IWuSokQG1p8vq9ULZ8rP9KhkJGdrZDW22iR7k0fkMWIp61vdQ/exec";
+    <div class="sezione" onclick="toggle(this)">❤️ Salute & Corpo</div>
+    <div class="contenuto">
+        <div class="sotto-sezione" onclick="toggle(this)">⚕️ Visite Mediche</div>
+        <div class="contenuto">
+            <ul>
+                <li>• Gastroenterologo (Ortona - Referto ASL)</li>
+                <li>• Ginecologo (Moncelli, Cortesi, Mautone)</li>
+                <li>• Endocrinologo (9 Marzo - Atri)</li>
+                <li>• Urologo / Ematologo</li>
+            </ul>
+        </div>
+        <div class="sotto-sezione" onclick="toggle(this)">✨ Estetica & Cura</div>
+        <div class="contenuto">
+            <ul>
+                <li>• Capelli: Percorso biondo e sano</li>
+                <li>• Viso: Filler (Dott.ssa Valentina)</li>
+                <li>• Epilazione: Seta Beauty / Arisia</li>
+            </ul>
+        </div>
+    </div>
 
-let planner = [
-  { titolo:"❤️ Salute & Corpo", colore:"salute",
-    sottoCategorie:[
-      { titolo:"Visite mediche",
-        sottoCategorie:[
-          { titolo:"Gastroenterologo (Ortona)", obiettivi:["Controllo referto online ASL Abruzzo","Telefonata per risultati","Ricerca gastroenterologi"] },
-          { titolo:"Ginecologo", sottoCategorie:[
-              { titolo:"Ricerca specialista", obiettivi:["Michele Moncelli","Marina Cortesi","Daniele Mautone","Carlo De Cicco","Massimiliano Marziali","Manuel Ianieri"] },
-              { titolo:"Temi da approfondire", obiettivi:["Endometriosi","Insulino-resistenza","Terapia ormonale"] }
-          ]},
-          { titolo:"Altri specialisti", obiettivi:["Urologo (Calcolo renale)","Ematologo (Trombofilia)","Endocrinologo (9 marzo)","Dermatologo","Senologia"] }
-        ]
-      },
-      { titolo:"Fisioterapia & Estetica", obiettivi:["Inizio Febbraio","Capelli (cura graduale)","Viso (Dott.ssa Valentina)","Laser (Seta Beauty)"] }
-  ]},
-  { titolo:"📅 Vita pratica & Scadenze", colore:"vita",
-    sottoCategorie:[
-      { titolo:"Concorsi pubblici", obiettivi:["Agenzia delle Entrate","INPS","Comune di Roma","MIC (entro 10 gennaio)"] },
-      { titolo:"Scadenze", obiettivi:["Patente (marzo)","iCloud (13 gennaio)","Ricerca casa nuova"] }
-  ]},
-  { titolo:"🛍️ Acquisti & Viaggi", colore:"acquisti",
-    sottoCategorie:[
-      { titolo:"Viaggi 2026", obiettivi:["Torino","Barcellona (Febbraio)","Abruzzo (Musei Chieti/Ortona)"] },
-      { titolo:"Shopping", obiettivi:["Cura capelli (spazzole/fon)","Planner libero"] }
-  ]}
-];
+    <div class="sezione" onclick="toggle(this)">📅 Vita Pratica & Concorsi</div>
+    <div class="contenuto">
+        <ul>
+            <li>• Concorso MIC (Scadenza 10 Gennaio)</li>
+            <li>• Concorsi Agenzia Entrate / INPS / Roma</li>
+            <li>• Rinnovo Patente (Entro Marzo)</li>
+            <li>• iCloud e Backup (13 Gennaio)</li>
+        </ul>
+    </div>
 
-function renderizza() {
-    const plannerDiv = document.getElementById('planner');
-    plannerDiv.innerHTML = '';
-    creaLista(planner, plannerDiv);
-}
+    <div class="sezione" onclick="toggle(this)">✈️ Viaggi & Shopping</div>
+    <div class="contenuto">
+        <ul>
+            <li>• Barcellona (Febbraio - Festival Luce)</li>
+            <li>• Torino</li>
+            <li>• Abruzzo (Musei Chieti e Ortona)</li>
+            <li>• Shopping: Spazzole e Phon dedicati</li>
+        </ul>
+    </div>
 
-function creaLista(arr, container, livello=2) {
-    arr.forEach((item, i) => {
-        const h = document.createElement('h' + livello);
-        h.textContent = item.titolo;
-        if(livello===2) h.dataset.color = item.colore;
-        h.onclick = () => {
-            const nextUl = h.nextElementSibling;
-            nextUl.classList.toggle('show');
-        };
-        container.appendChild(h);
-
-        const ul = document.createElement('ul');
-        if(item.obiettivi) {
-            item.obiettivi.forEach((obj, j) => {
-                const li = document.createElement('li');
-                li.textContent = "• " + obj;
-                ul.appendChild(li);
-            });
+    <script>
+        function toggle(elemento) {
+            const prossimo = elemento.nextElementSibling;
+            if (prossimo && prossimo.classList.contains('contenuto')) {
+                prossimo.classList.toggle('visibile');
+            }
         }
-        if(item.sottoCategorie) creaLista(item.sottoCategorie, ul, livello + 1);
-        container.appendChild(ul);
-    });
-}
-
-async function caricaDaCloud() {
-    try {
-        const res = await fetch(SCRIPT_URL);
-        const data = await res.json();
-        if(data && Array.isArray(data)) planner = data;
-    } catch(e) { console.log("Uso dati locali"); }
-    renderizza();
-}
-
-async function salvaSuCloud() {
-    alert("Salvataggio in corso...");
-    await fetch(SCRIPT_URL, { method:'POST', mode:'no-cors', body:JSON.stringify(planner) });
-    alert("Salvato!");
-}
-
-caricaDaCloud();
-</script>
+        console.log("Planner caricato correttamente.");
+    </script>
 </body>
 </html>
