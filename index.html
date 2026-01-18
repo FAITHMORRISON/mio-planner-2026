@@ -8,42 +8,21 @@
 <title>Planner Obiettivi 2026 - Zen Colorato</title>
 <style>
 body {
-  /* Font di sistema: più belli e leggibili */
   font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   background:#fdfbf5;
   color:#4a4a4a;
   font-size: 16px;
   line-height: 1.5;
-  /* Centra il sito su PC, lo tiene pieno su Mobile */
   max-width: 800px;
   margin: 20px auto; 
-  padding: 0 15px; /* Evita che il testo tocchi i bordi del telefono */
+  padding: 0 15px;
 }
-
-h1 {
-  text-align:center;
-  margin-bottom:30px;
-  color:#555;
-  font-size: 1.5rem;
-}
-
-/* Macro headers ottimizzati per il tocco */
+h1 { text-align:center; margin-bottom:30px; color:#555; font-size: 1.5rem; }
 h2,h3,h4,h5 {
-  cursor:pointer;
-  padding: 12px 15px; 
-  border-radius:10px;
-  margin: 10px 0;
-  transition: all 0.2s ease;
-  border-bottom: 1px solid rgba(0,0,0,0.05);
-  line-height: 1.3;
+  cursor:pointer; padding: 12px 15px; border-radius:10px; margin: 10px 0;
+  transition: all 0.2s ease; border-bottom: 1px solid rgba(0,0,0,0.05); line-height: 1.3;
 }
-
-h2:hover, h3:hover, h4:hover, h5:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-}
-
-/* I tuoi Colori Zen originali */
+h2:hover, h3:hover, h4:hover, h5:hover { transform: translateY(-1px); box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
 h2[data-color="salute"] { background:#f0e3cf; }
 h2[data-color="vita"] { background:#e2ded6; }
 h2[data-color="acquisti"] { background:#d9e2d0; }
@@ -51,175 +30,98 @@ h2[data-color="lifestyle"] { background:#f5f2e7; }
 h2[data-color="viaggi"] { background:#fef7e5; }
 h2[data-color="eventi"] { background:#e3e7de; }
 h2[data-color="libero"] { background:#fdf9f0; }
-
-/* Livelli inferiori con rientro fluido */
 h3 { background:#e0d8c4; margin-left:10px; }
 h4 { background:#d0dec4; margin-left:20px; }
 h5 { background:#f0efe5; margin-left:30px; }
-
 ul { list-style:none; padding-left:10px; margin:5px 0; }
 .collapsible-content { display:none; }
-
-li { 
-  padding: 8px 0; /* Più spazio verticale per gli obiettivi */
-  display:flex; 
-  align-items:center; 
-  flex-wrap: wrap;
-  border-bottom: 1px thin #eee;
-}
-
-/* Bottoni più grandi per le dita */
-button {
-  margin: 4px 2px;
-  padding: 8px 12px;
-  font-size: 14px;
-  border-radius:8px;
-  border:none;
-  background:#e6e2d3;
-  cursor:pointer;
-  transition: all 0.2s ease;
-  -webkit-appearance: none;
-}
-
-button:hover { background:#d9d4c5; }
-
-input[type="checkbox"] { 
-  transform: scale(1.2); /* Checkbox leggermente più grandi */
-  margin-right:10px; 
-}
-
-.note { font-style:italic; color:#666; margin-top: 4px; width: 100%; font-size: 0.9em; }
-.date { color:#3a7dcb; font-size: 0.9em; margin-left: 5px; }
+li { padding: 8px 0; display:flex; align-items:center; flex-wrap: wrap; border-bottom: 1px solid #eee; }
+button { margin: 4px 2px; padding: 8px 12px; font-size: 14px; border-radius:8px; border:none; background:#e6e2d3; cursor:pointer; }
+input[type="checkbox"] { transform: scale(1.2); margin-right:10px; }
+.note { font-style:italic; color:#666; margin-left: 10px; font-size: 0.9em; flex-basis: 100%; margin-top: 5px;}
+.date { color:#3a7dcb; font-size: 0.9em; margin-left: 10px; font-weight: bold;}
 .flag { font-size: 1.2em; margin-left:10px; cursor:pointer; }
-
 .add-item-btn { background:#cfd8d2; font-weight: bold; }
-.delete-item-btn { background:#f4b4b4; color: #721c24; }
-
-/* La Nuvoletta nell'angolo */
-.sync-btn {
-  position: fixed;
-  bottom: 25px;
-  right: 25px;
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  background: #4a4a4a;
-  color: white;
-  border: none;
-  cursor: pointer;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-  z-index: 10000;
-  font-size: 26px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
+.delete-item-btn { background:#f4b4b4; color: #721c24; margin-left: auto;}
+.sync-btn { position: fixed; bottom: 25px; right: 25px; width: 60px; height: 60px; border-radius: 50%; background: #4a4a4a; color: white; border: none; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.3); z-index: 10000; font-size: 26px; display: flex; align-items: center; justify-content: center; }
 </style>
 </head>
 <body>
 
 <h1>Planner Obiettivi 2026 - Zen Colorato</h1>
-<button class="sync-btn" onclick="salvaSuCloud()" title="Salva tutto sul Cloud">☁️</button>
+<button class="sync-btn" onclick="salvaSuCloud()">☁️</button>
 <div id="planner"></div>
 
 <script>
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzf2V7uR83vAiSN4kMm4IWuSokQG1p8vq9ULZ8rP9KhkJGdrZDW22iR7k0fkMWIp61vdQ/exec";
-// ==================== Planner completo ====================
+
 let planner = [
-  { titolo:"❤️ Salute & Corpo", colore:"salute",
-    sottoCategorie:[
-      { titolo:"Visite mediche",
-        sottoCategorie:[
-          { titolo:"Gastroenterologo (Ortona)", obiettivi:["Controllo referto online ASL Abruzzo","Telefonata per risultati","Ricerca / lista gastroenterologi","Note e referti"] },
+  { titolo:"❤️ Salute & Corpo", colore:"salute", sottoCategorie:[
+      { titolo:"Visite mediche", sottoCategorie:[
+          { titolo:"Gastroenterologo (Ortona)", obiettivi:[{testo:"Controllo referto online ASL Abruzzo"},{testo:"Telefonata per risultati"},{testo:"Ricerca / lista gastroenterologi"},{testo:"Note e referti"}] },
           { titolo:"Ginecologo", sottoCategorie:[
-              { titolo:"Ricerca specialista", obiettivi:["Michele Moncelli","Marina Cortesi","Daniele Mautone (Artemisia)","Carlo De Cicco","Massimiliano Marziali","Manuel Ianieri"] },
-              { titolo:"Temi da approfondire", obiettivi:["Endometriosi","Insulino-resistenza","Terapia ormonale (valutazioni)","Dieta per endometriosi","Fertilità / salute ovarica"] },
-              { titolo:"Esami da discutere", obiettivi:["Trombofilia (pre-terapia ormonale)","Risonanza magnetica pelvica","Marker ovarici CA125"] },
+              { titolo:"Ricerca specialista", obiettivi:[{testo:"Michele Moncelli"},{testo:"Marina Cortesi"},{testo:"Daniele Mautone (Artemisia)"},{testo:"Carlo De Cicco"},{testo:"Massimiliano Marziali"},{testo:"Manuel Ianieri"}] },
+              { titolo:"Temi da approfondire", obiettivi:[{testo:"Endometriosi"},{testo:"Insulino-resistenza"},{testo:"Terapia ormonale (valutazioni)"},{testo:"Dieta per endometriosi"},{testo:"Fertilità / salute ovarica"}] },
+              { titolo:"Esami da discutere", obiettivi:[{testo:"Trombofilia (pre-terapia ormonale)"},{testo:"Risonanza magnetica pelvica"},{testo:"Marker ovarici CA125"}] },
               { titolo:"Note post-visita", obiettivi:[] },
-              { titolo:"Referti", obiettivi:["Contattare ASL Lazio – esito HPV test"] }
+              { titolo:"Referti", obiettivi:[{testo:"Contattare ASL Lazio – esito HPV test"}] }
           ]},
-          { titolo:"Urologo", obiettivi:["Calcolo renale","Esami / indicazioni"] },
-          { titolo:"Ematologo / Genetista", obiettivi:["Esami genetici trombofilia","Familiarità"] },
-          { titolo:"Endocrinologo", obiettivi:["Visita Ospedale di Atri","Data: 9 marzo"] },
-          { titolo:"Dermatologo", obiettivi:["Bolle cutanee ricorrenti","Diagnosi / terapia"] },
-          { titolo:"Senologia", obiettivi:["Prima ecografia senologica","Prenotazione entro l’anno"] },
-          { titolo:"Psicoterapia", obiettivi:["Ricerca psicoterapeuta","Bonus psicologico","Avvio percorso terapeutico","Lista esperti / professionisti"] }
-        ]
-      },
-      { titolo:"Analisi ed esami", obiettivi:["Ferro e ferritina","Marker ovarici CA125","Risonanza magnetica pelvica","Esami trombofilia"] },
+          { titolo:"Urologo", obiettivi:[{testo:"Calcolo renale"},{testo:"Esami / indicazioni"}] },
+          { titolo:"Ematologo / Genetista", obiettivi:[{testo:"Esami genetici trombofilia"},{testo:"Familiarità"}] },
+          { titolo:"Endocrinologo", obiettivi:[{testo:"Visita Ospedale di Atri"},{testo:"Data: 9 marzo"}] },
+          { titolo:"Dermatologo", obiettivi:[{testo:"Bolle cutanee ricorrenti"},{testo:"Diagnosi / terapia"}] },
+          { titolo:"Senologia", obiettivi:[{testo:"Prima ecografia senologica"},{testo:"Prenotazione entro l’anno"}] },
+          { titolo:"Psicoterapia", obiettivi:[{testo:"Ricerca psicoterapeuta"},{testo:"Bonus psicologico"},{testo:"Avvio percorso terapeutico"}] }
+      ]},
+      { titolo:"Analisi ed esami", obiettivi:[{testo:"Ferro e ferritina"},{testo:"Marker ovarici CA125"},{testo:"Risonanza magnetica pelvica"}] },
       { titolo:"Fisioterapia & Movimento", sottoCategorie:[
-        { titolo:"Fisioterapia prescritta dal fisiatra", obiettivi:["Inizio: febbraio","Ricerca fisioterapisti / centri"] },
-        { titolo:"Posturale", obiettivi:["Flag","Nota","Data"] },
-        { titolo:"Ripresa attività sportiva", obiettivi:["Flag","Nota","Data"] },
-        { titolo:"Obiettivo fine anno", obiettivi:["Tonificazione e miglioramento fisico"] }
+          { titolo:"Fisioterapia prescritta dal fisiatra", obiettivi:[{testo:"Inizio: febbraio"}] },
+          { titolo:"Posturale", obiettivi:[] },
+          { titolo:"Ripresa attività sportiva", obiettivi:[] }
       ]},
       { titolo:"Estetica & Cura del corpo", sottoCategorie:[
-        { titolo:"Capelli", obiettivi:["Ricerca salone fidato a Roma","Percorso di cura graduale","Tornare bionda, capelli lunghi e sani"] },
-        { titolo:"Viso", obiettivi:["Filler di rinfresco","Ricerca medici specialisti","Riferimento: Dott.ssa Valentina (Pescara)"] },
-        { titolo:"Epilazione", obiettivi:["Contattare SETA Beauty Tiburtina","Laser corpo 2026","Prenotazioni Arisia ogni ~40 giorni"] },
-        { titolo:"Occhi", obiettivi:["Cambio montatura","Occhiali nuovi"] }
-      ]},
-      { titolo:"Integratori", obiettivi:["Normocis 400 / Normocis INO 400","Swiss Capelli Sublimi"] }
+          { titolo:"Capelli", obiettivi:[{testo:"Ricerca salone fidato a Roma"},{testo:"Percorso di cura graduale"},{testo:"Tornare bionda"}] },
+          { titolo:"Viso", obiettivi:[{testo:"Filler di rinfresco"},{testo:"Riferimento: Dott.ssa Valentina (Pescara)"}] }
+      ]}
   ]},
-  { titolo:"📅 Vita pratica & Scadenze", colore:"vita",
-    sottoCategorie:[
-      { titolo:"Abbonamenti & digitale", obiettivi:["Benzina Enilive (sconto gennaio)","Chat Apple – info backup","Riduzione iCloud (entro 13 gennaio)","Backup file su KDrive"] },
-      { titolo:"Vendite", obiettivi:["iPhone 14 Pro"] },
-      { titolo:"Concorsi pubblici", obiettivi:["Agenzia delle Entrate","INPS (448 posti)","Comune di Roma (31 posti)","Guardia di Finanza","Corte dei Conti","Ufficio delle Dogane (1500)","MIC – Scadenza iscrizioni: entro 10 gennaio"] },
-      { titolo:"Documenti", obiettivi:["Rinnovo patente (entro marzo)"] },
-      { titolo:"Casa", obiettivi:["Ricerca casa nuova","Scadenze e bollette – Spazio aggiornabile"] }
+  { titolo:"📅 Vita pratica & Scadenze", colore:"vita", sottoCategorie:[
+      { titolo:"Abbonamenti & digitale", obiettivi:[{testo:"Benzina Enilive"},{testo:"Chat Apple"},{testo:"Riduzione iCloud"},{testo:"Backup KDrive"}] },
+      { titolo:"Concorsi pubblici", obiettivi:[{testo:"Agenzia delle Entrate"},{testo:"INPS"},{testo:"Comune di Roma"},{testo:"MIC (entro 10 gen)"}] },
+      { titolo:"Documenti", obiettivi:[{testo:"Rinnovo patente (marzo)"}] }
   ]},
-  { titolo:"🛍️ Acquisti & Outfit", colore:"acquisti",
-    sottoCategorie:[
+  { titolo:"🛍️ Acquisti & Outfit", colore:"acquisti", sottoCategorie:[
       { titolo:"Acquisti graduali 2026", obiettivi:[] },
-      { titolo:"Cura capelli", obiettivi:["Ricerca spazzole, fon dedicati","Ricerca saloni per nuovo look biondo"] },
-      { titolo:"Lista spesa / acquisti volatili", obiettivi:[] },
-      { titolo:"Planner libero", obiettivi:[] }
+      { titolo:"Cura capelli", obiettivi:[{testo:"Ricerca spazzole"}] }
   ]},
-  { titolo:"🎨 Lifestyle / Hobby / Crescita personale", colore:"lifestyle",
-    sottoCategorie:[
-      { titolo:"Confini personali", obiettivi:["Eliminare persone nocive / deludenti"] },
-      { titolo:"Scuole / attività", obiettivi:["Motocross (entro 2026)"] },
-      { titolo:"VHS / Digitalizzazione famiglia", obiettivi:[] },
-      { titolo:"Studio / approfondimento", obiettivi:["AI","ML","Arte generativa / procedurale"] },
-      { titolo:"Eventi / mostre / concerti", obiettivi:[] }
+  { titolo:"🎨 Lifestyle / Hobby", colore:"lifestyle", sottoCategorie:[
+      { titolo:"Crescita", obiettivi:[{testo:"Eliminare persone nocive"}] },
+      { titolo:"Studio", obiettivi:[{testo:"AI"},{testo:"ML"}] }
   ]},
-  { titolo:"✈️ Viaggi / Luoghi", colore:"viaggi",
-    sottoCategorie:[
+  { titolo:"✈️ Viaggi / Luoghi", colore:"viaggi", sottoCategorie:[
       { titolo:"Torino", obiettivi:[] },
-      { titolo:"Festival della luce – Barcellona (febbraio)", obiettivi:[] },
-      { titolo:"Abruzzo", obiettivi:["Ortona","Chieti","Museo Barbella","Museo Archeologico"] }
+      { titolo:"Barcellona (febbraio)", obiettivi:[] },
+      { titolo:"Abruzzo", obiettivi:[{testo:"Ortona"},{testo:"Museo Barbella"}] }
   ]},
-  { titolo:"🎭 Eventi culturali", colore:"eventi",
-    sottoCategorie:[
-      { titolo:"Mostre", obiettivi:[] },
-      { titolo:"Concerti", obiettivi:[] },
-      { titolo:"Eventi da aggiungere", obiettivi:[] }
-  ]},
-  { titolo:"🧭 PLANNER LIBERO", colore:"libero",
-    sottoCategorie:[
-      { titolo:"Spazio aperto", obiettivi:[] },
-      { titolo:"Appunti non categorizzati", obiettivi:[] },
-      { titolo:"Idee future", obiettivi:[] },
-      { titolo:"Pensieri in evoluzione", obiettivi:[] }
+  { titolo:"🧭 PLANNER LIBERO", colore:"libero", sottoCategorie:[
+      { titolo:"Spazio aperto", obiettivi:[] }
   ]}
 ];
 
-// ==================== Funzioni ====================
-
-// Carica da localStorage se presente
+// Caricamento Dati
 if(localStorage.getItem('planner')) {
-  try { planner = JSON.parse(localStorage.getItem('planner')); } catch(e){ console.error(e); }
+    try { planner = JSON.parse(localStorage.getItem('planner')); } catch(e){ console.error(e); }
 }
 
-// Salva planner
 function salvaPlanner() { localStorage.setItem('planner', JSON.stringify(planner)); }
 
-// Funzione ricorsiva
-function creaListaRec(arr, container, livello=2, path=[]){
-  arr.forEach((item,i)=>{
-    const currentPath = [...path, i];
+function renderizzaTutto() {
+    const p = document.getElementById('planner');
+    p.innerHTML = '';
+    creaListaRec(planner, p);
+}
 
+function creaListaRec(arr, container, livello=2){
+  arr.forEach((item, i) => {
     const h = document.createElement('h'+livello);
     h.textContent = item.titolo;
     if(livello===2 && item.colore) h.dataset.color = item.colore;
@@ -229,152 +131,113 @@ function creaListaRec(arr, container, livello=2, path=[]){
     const ul = document.createElement('ul');
     ul.classList.add('collapsible-content');
 
-    // Obiettivi
-    (item.obiettivi||[]).forEach((objText,j)=>{
+    (item.obiettivi || []).forEach((obj, j) => {
+      // Conversione stringhe vecchie in oggetti
+      if (typeof obj === 'string') {
+          obj = { testo: obj, completato: false, nota: "", data: "", flag: false };
+          item.obiettivi[j] = obj;
+      }
+
       const li = document.createElement('li');
-      const checkbox = document.createElement('input');
-      checkbox.type='checkbox';
-      li.appendChild(checkbox);
-      li.appendChild(document.createTextNode(' ' + objText));
+      
+      const check = document.createElement('input');
+      check.type = 'checkbox';
+      check.checked = obj.completato || false;
+      check.onchange = () => { obj.completato = check.checked; salvaPlanner(); };
+      li.appendChild(check);
 
-      // Nota
-      const btnNote = document.createElement('button');
-      btnNote.textContent='+ Nota';
-      btnNote.onclick=()=>{ 
-        const nota = prompt('Inserisci nota:'); 
-        if(nota){ 
-          const span = document.createElement('span');
-          span.textContent=' — ' + nota;
-          span.className='note';
-          li.appendChild(span);
-        }
-      };
-      li.appendChild(btnNote);
-
-      // Data
-      const btnDate = document.createElement('button');
-      btnDate.textContent='📅';
-      btnDate.onclick=()=>{ 
-        const data = prompt('Inserisci data/ora:'); 
-        if(data){
-          const span = document.createElement('span');
-          span.textContent=' — ' + data;
-          span.className='date';
-          li.appendChild(span);
-        }
-      };
-      li.appendChild(btnDate);
+      const txt = document.createElement('span');
+      txt.textContent = obj.testo;
+      li.appendChild(txt);
 
       // Flag
-      const btnFlag = document.createElement('span');
-      btnFlag.textContent='🔴';
-      btnFlag.className='flag';
-      btnFlag.onclick=()=>{ btnFlag.textContent = btnFlag.textContent==='🔴' ? '✅' : '🔴'; };
-      li.appendChild(btnFlag);
+      const f = document.createElement('span');
+      f.className = 'flag';
+      f.textContent = obj.flag ? '✅' : '🔴';
+      f.onclick = () => { obj.flag = !obj.flag; f.textContent = obj.flag ? '✅' : '🔴'; salvaPlanner(); };
+      li.appendChild(f);
+
+      // Data
+      const bD = document.createElement('button');
+      bD.textContent = '📅';
+      bD.onclick = () => { 
+          const res = prompt('Data:', obj.data || ""); 
+          if(res !== null) { obj.data = res; salvaPlanner(); renderizzaTutto(); }
+      };
+      li.appendChild(bD);
+
+      // Nota
+      const bN = document.createElement('button');
+      bN.textContent = '+ Nota';
+      bN.onclick = () => { 
+          const res = prompt('Nota:', obj.nota || ""); 
+          if(res !== null) { obj.nota = res; salvaPlanner(); renderizzaTutto(); }
+      };
+      li.appendChild(bN);
 
       // Delete
-      const btnDel = document.createElement('button');
-      btnDel.textContent='Elimina';
-      btnDel.className='delete-item-btn';
-      btnDel.onclick=()=>{
-        item.obiettivi.splice(j,1);
-        salvaPlanner();
-        container.innerHTML=''; 
-        creaListaRec(planner, plannerDiv);
-      };
-      li.appendChild(btnDel);
+      const bDel = document.createElement('button');
+      bDel.textContent = '🗑️';
+      bDel.className = 'delete-item-btn';
+      bDel.onclick = () => { item.obiettivi.splice(j, 1); salvaPlanner(); renderizzaTutto(); };
+      li.appendChild(bDel);
 
+      if(obj.data) {
+          const sD = document.createElement('span'); sD.className = 'date';
+          sD.textContent = ' ⏳ ' + obj.data; li.appendChild(sD);
+      }
+      if(obj.nota) {
+          const sN = document.createElement('div'); sN.className = 'note';
+          sN.textContent = '📝 Note: ' + obj.nota; li.appendChild(sN);
+      }
       ul.appendChild(li);
     });
 
-    // Pulsante aggiungi
-    const btnAdd = document.createElement('button');
-    btnAdd.textContent='+ Aggiungi';
-    btnAdd.className='add-item-btn';
-    btnAdd.onclick=()=>{
-      const nuovo = prompt('Inserisci nuovo elemento:');
-      if(nuovo){
-        item.obiettivi = item.obiettivi || [];
-        item.obiettivi.push(nuovo);
-        salvaPlanner();
-        container.innerHTML='';
-        creaListaRec(planner, plannerDiv);
-      }
+    const bAdd = document.createElement('button');
+    bAdd.textContent = '+ Aggiungi';
+    bAdd.className = 'add-item-btn';
+    bAdd.onclick = () => {
+        const n = prompt('Cosa aggiungere?');
+        if(n) { item.obiettivi.push({testo: n, completato: false, nota:"", data:"", flag:false}); salvaPlanner(); renderizzaTutto(); }
     };
-    ul.appendChild(btnAdd);
+    ul.appendChild(bAdd);
 
-    // SottoCategorie
-    if(item.sottoCategorie) creaListaRec(item.sottoCategorie, ul, livello+1, currentPath);
-
+    if(item.sottoCategorie) creaListaRec(item.sottoCategorie, ul, livello+1);
     container.appendChild(ul);
   });
 }
 
-// ==================== Inizializzazione ====================
-const plannerDiv = document.getElementById('planner');
-creaListaRec(planner, plannerDiv);
+renderizzaTutto();
 
-// ==================== Collapsible ====================
-document.addEventListener('click', e=>{
+document.addEventListener('click', e => {
   if(e.target.classList.contains('collapsible')){
     const nextUl = e.target.nextElementSibling;
-    if(nextUl && nextUl.classList.contains('collapsible-content')){
-      nextUl.style.display = nextUl.style.display==='block' ? 'none' : 'block';
-    }
+    if(nextUl) nextUl.style.display = nextUl.style.display==='block' ? 'none' : 'block';
   }
 });
 
-// ==================== INTEGRAZIONE CLOUD ====================
-
-// 1. Funzione per salvare (Nuvoletta)
 async function salvaSuCloud() {
     const btn = document.querySelector('.sync-btn');
-    const iconaOriginale = btn.textContent;
     btn.textContent = "⏳";
-    
     try {
-        await fetch(SCRIPT_URL, {
-            method: 'POST',
-            mode: 'no-cors',
-            body: JSON.stringify(planner)
-        });
-        alert("✅ Sincronizzato con successo su Google Sheets!");
-    } catch (e) {
-        alert("❌ Errore durante il salvataggio");
-    }
-    btn.textContent = iconaOriginale;
+        await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(planner) });
+        alert("✅ Sincronizzato!");
+    } catch (e) { alert("❌ Errore"); }
+    btn.textContent = "☁️";
 }
 
-// 2. Funzione per caricare (Prudente)
 async function caricaDaCloud() {
     try {
         const response = await fetch(SCRIPT_URL);
         const text = await response.text();
-        
-        if (text && text.trim() !== "" && text !== "[]") {
-            const data = JSON.parse(text);
-            if (Array.isArray(data) && data.length > 0) {
-                planner = data;
-                // Aggiorna anche il localStorage locale per sicurezza
-                salvaPlanner();
-                // Ridisegna la lista con i nuovi dati
-                plannerDiv.innerHTML = '';
-                creaListaRec(planner, plannerDiv);
-                console.log("Dati aggiornati dal Cloud");
-            }
+        if (text && text.length > 50) {
+            planner = JSON.parse(text);
+            salvaPlanner();
+            renderizzaTutto();
         }
-    } catch (e) {
-        console.log("Database vuoto o errore, resto sui dati locali");
-    }
+    } catch (e) { console.log("Cloud vuoto"); }
 }
-
-// 3. Esegui il controllo cloud dopo che la pagina è pronta
 caricaDaCloud();
-
 </script>
-</body>
-</html>
-</script>
-
 </body>
 </html>
