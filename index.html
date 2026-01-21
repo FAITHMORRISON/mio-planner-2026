@@ -7,23 +7,21 @@
 <link rel="icon" type="image/png" sizes="32x32" href="https://cdn-icons-png.flaticon.com/512/2675/2675848.png">
 <title>Planner Obiettivi 2026 - Zen Colorato</title>
 <style>
-/* Il tuo stile originale intatto */
 body {
   font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  background:#fdfbf5;
-  color:#4a4a4a;
-  font-size: 16px;
-  line-height: 1.5;
-  max-width: 800px;
-  margin: 20px auto; 
-  padding: 0 15px;
+  background:#fdfbf5; color:#4a4a4a; font-size: 16px; line-height: 1.5; max-width: 800px; margin: 20px auto; padding: 0 15px;
 }
 h1 { text-align:center; margin-bottom:30px; color:#555; font-size: 1.5rem; }
+
+/* Intestazioni con protezione per il cestino */
 h2,h3,h4,h5 {
   cursor:pointer; padding: 12px 15px; border-radius:10px; margin: 10px 0;
   transition: all 0.2s ease; border-bottom: 1px solid rgba(0,0,0,0.05); line-height: 1.3;
+  display: flex; justify-content: space-between; align-items: center;
 }
 h2:hover, h3:hover, h4:hover, h5:hover { transform: translateY(-1px); box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+
+/* Colori categorie */
 h2[data-color="salute"] { background:#f0e3cf; }
 h2[data-color="vita"] { background:#e2ded6; }
 h2[data-color="acquisti"] { background:#d9e2d0; }
@@ -34,6 +32,16 @@ h2[data-color="libero"] { background:#fdf9f0; }
 h3 { background:#e0d8c4; margin-left:10px; }
 h4 { background:#d0dec4; margin-left:20px; }
 h5 { background:#f0efe5; margin-left:30px; }
+
+/* Testo dei titoli: evita sovrapposizione cestino */
+.title-text { flex-grow: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-right: 10px; }
+
+/* Cestino per categorie (ridotto e pulito) */
+.delete-cat-btn { 
+    background: rgba(244, 180, 180, 0.6); color: #721c24; 
+    padding: 4px 8px; font-size: 12px; border-radius: 6px; border:none; flex-shrink: 0;
+}
+
 ul { list-style:none; padding-left:10px; margin:5px 0; }
 .collapsible-content { display:none; }
 li { padding: 8px 0; display:flex; align-items:center; flex-wrap: wrap; border-bottom: 1px solid #eee; }
@@ -43,13 +51,15 @@ input[type="checkbox"] { transform: scale(1.2); margin-right:10px; }
 .date { color:#3a7dcb; font-size: 0.9em; margin-left: 10px; font-weight: bold;}
 .flag { font-size: 1.2em; margin-left:10px; cursor:pointer; }
 .add-item-btn { background:#cfd8d2; font-weight: bold; }
-.delete-item-btn { background:#f4b4b4; color: #721c24; margin-left: auto;}
-.sync-btn { position: fixed; bottom: 25px; right: 25px; width: 60px; height: 60px; border-radius: 50%; background: #4a4a4a; color: white; border: none; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.3); z-index: 10000; font-size: 26px; display: flex; align-items: center; justify-content: center; }
+.delete-item-btn { background:#f4b4b4; color: #721c24; margin-left: auto; font-size: 11px; padding: 4px 8px;}
 
-/* Aggiunta per Login e Agenda */
+/* Agenda a comparsa (Stile mobile-friendly) */
+#agenda-container { margin-bottom: 25px; display: none; border-radius: 12px; overflow: hidden; border: 1px solid #ffcc80; }
+.agenda-header { background: #fff5e6; padding: 12px 15px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-weight: bold; color: #e67e22; }
+#agenda-content { display: none; background: #fffaf0; padding: 15px; border-top: 1px solid #ffcc80; }
+
+.sync-btn { position: fixed; bottom: 25px; right: 25px; width: 60px; height: 60px; border-radius: 50%; background: #4a4a4a; color: white; border: none; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.3); z-index: 10000; font-size: 26px; display: flex; align-items: center; justify-content: center; }
 #login-screen { position: fixed; inset: 0; background: #fdfbf5; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 20001; }
-#agenda-container { background: #fff5e6; border: 1px solid #ffcc80; border-radius: 12px; padding: 15px; margin-bottom: 25px; display: none; }
-#agenda-container h3 { margin: 0 0 10px 0; font-size: 1.1rem; color: #e67e22; border:none; cursor:default; background:none; padding:0;}
 </style>
 </head>
 <body>
@@ -62,7 +72,15 @@ input[type="checkbox"] { transform: scale(1.2); margin-right:10px; }
 
 <div id="main-content" style="display:none;">
     <h1>Planner Obiettivi 2026 - Zen Colorato</h1>
-    <div id="agenda-container"></div>
+    
+    <div id="agenda-container">
+        <div class="agenda-header" onclick="toggleAgenda()">
+            <span>🗓️ Prossimi Appuntamenti</span>
+            <span id="agenda-arrow">▼</span>
+        </div>
+        <div id="agenda-content"></div>
+    </div>
+
     <div id="planner"></div>
 </div>
 
@@ -124,10 +142,8 @@ let planner = [
   ]}
 ];
 
-// FUNZIONI LOGIN
 function checkLogin() {
-    const val = document.getElementById('pass-input').value;
-    if(val === PASSWORD_CORRETTA) {
+    if(document.getElementById('pass-input').value === PASSWORD_CORRETTA) {
         localStorage.setItem('auth_2026', 'true');
         document.getElementById('login-screen').style.display = 'none';
         document.getElementById('main-content').style.display = 'block';
@@ -140,9 +156,17 @@ if(localStorage.getItem('auth_2026') === 'true') {
     document.getElementById('main-content').style.display = 'block';
 }
 
-// FUNZIONE AGENDA
+function toggleAgenda() {
+    const content = document.getElementById('agenda-content');
+    const arrow = document.getElementById('agenda-arrow');
+    const isOpen = content.style.display === 'block';
+    content.style.display = isOpen ? 'none' : 'block';
+    arrow.textContent = isOpen ? '▼' : '▲';
+}
+
 function aggiornaAgenda() {
     const container = document.getElementById('agenda-container');
+    const content = document.getElementById('agenda-content');
     let scadenze = [];
     const cerca = (lista) => {
         lista.forEach(c => {
@@ -153,9 +177,9 @@ function aggiornaAgenda() {
     cerca(planner);
     if(scadenze.length > 0) {
         container.style.display = "block";
-        container.innerHTML = "<h3>🗓️ Prossimi Appuntamenti</h3>";
+        content.innerHTML = "";
         scadenze.sort((a,b) => a.data.localeCompare(b.data)).forEach(s => {
-            container.innerHTML += `<div style="margin-bottom:8px; font-size:0.95em;"><strong>${s.data}</strong>: ${s.testo} <small style="color:#888;">(${s.cat})</small></div>`;
+            content.innerHTML += `<div style="margin-bottom:8px; font-size:0.9em; border-bottom:1px dashed #ccc; padding-bottom:4px;"><strong>${s.data}</strong>: ${s.testo} <br><small style="color:gray;">(${s.cat})</small></div>`;
         });
     } else { container.style.display = "none"; }
 }
@@ -176,13 +200,18 @@ function renderizzaTutto() {
 function creaListaRec(arr, container, livello=2){
   arr.forEach((item, i) => {
     const h = document.createElement('h'+livello);
-    h.textContent = item.titolo;
-    if(livello===2 && item.colore) h.dataset.color = item.colore;
     h.classList.add('collapsible');
+    if(livello===2 && item.colore) h.dataset.color = item.colore;
     
-    // Tasto elimina categoria
+    // Contenitore testo per protezione overflow
+    const spanT = document.createElement('span');
+    spanT.className = 'title-text';
+    spanT.textContent = item.titolo;
+    h.appendChild(spanT);
+    
+    // Cestino categoria ridotto
     const bDelCat = document.createElement('button');
-    bDelCat.textContent = '🗑️'; bDelCat.style.float = 'right'; bDelCat.className = 'delete-item-btn';
+    bDelCat.textContent = '🗑️'; bDelCat.className = 'delete-cat-btn';
     bDelCat.onclick = (e) => { e.stopPropagation(); if(confirm("Eliminare intera sezione?")){ arr.splice(i,1); salvaPlanner(); renderizzaTutto(); } };
     h.appendChild(bDelCat);
     
@@ -192,24 +221,15 @@ function creaListaRec(arr, container, livello=2){
     ul.classList.add('collapsible-content');
 
     (item.obiettivi || []).forEach((obj, j) => {
-      if (typeof obj === 'string') {
-          obj = { testo: obj, completato: false, nota: "", data: "", flag: false };
-          item.obiettivi[j] = obj;
-      }
+      if (typeof obj === 'string') { obj = { testo: obj, completato: false, nota: "", data: "", flag: false }; item.obiettivi[j] = obj; }
       const li = document.createElement('li');
-      const check = document.createElement('input');
-      check.type = 'checkbox';
-      check.checked = obj.completato || false;
+      const check = document.createElement('input'); check.type = 'checkbox'; check.checked = obj.completato || false;
       check.onchange = () => { obj.completato = check.checked; salvaPlanner(); };
       li.appendChild(check);
 
-      const txt = document.createElement('span');
-      txt.textContent = obj.testo;
-      li.appendChild(txt);
+      const txt = document.createElement('span'); txt.textContent = obj.testo; li.appendChild(txt);
 
-      const f = document.createElement('span');
-      f.className = 'flag';
-      f.textContent = obj.flag ? '✅' : '🔴';
+      const f = document.createElement('span'); f.className = 'flag'; f.textContent = obj.flag ? '✅' : '🔴';
       f.onclick = () => { obj.flag = !obj.flag; salvaPlanner(); renderizzaTutto(); };
       li.appendChild(f);
 
@@ -217,7 +237,8 @@ function creaListaRec(arr, container, livello=2){
       bD.onclick = () => { const res = prompt('Data:', obj.data || ""); if(res !== null) { obj.data = res; salvaPlanner(); renderizzaTutto(); } };
       li.appendChild(bD);
 
-      const bN = document.createElement('button'); bN.textContent = '+ Nota';
+      // Tasto nota abbreviato con emoji
+      const bN = document.createElement('button'); bN.textContent = '📝';
       bN.onclick = () => { const res = prompt('Nota:', obj.nota || ""); if(res !== null) { obj.nota = res; salvaPlanner(); renderizzaTutto(); } };
       li.appendChild(bN);
 
@@ -230,12 +251,11 @@ function creaListaRec(arr, container, livello=2){
       ul.appendChild(li);
     });
 
-    // Sdoppiamento tasto aggiungi
     const divAdd = document.createElement('div');
     const bAddObj = document.createElement('button'); bAddObj.textContent = '+ Obiettivo'; bAddObj.className = 'add-item-btn';
     bAddObj.onclick = () => { const n = prompt('Nuovo obiettivo:'); if(n) { item.obiettivi.push({testo: n, completato: false, nota:"", data:"", flag:false}); salvaPlanner(); renderizzaTutto(); } };
     
-    const bAddSub = document.createElement('button'); bAddSub.textContent = '+ Sotto-sezione'; bAddSub.className = 'add-item-btn';
+    const bAddSub = document.createElement('button'); bAddSub.textContent = '+ Sezione'; bAddSub.className = 'add-item-btn';
     bAddSub.onclick = () => { const n = prompt('Nome sezione:'); if(n) { item.sottoCategorie = item.sottoCategorie || []; item.sottoCategorie.push({titolo: n, obiettivi: [], sottoCategorie: []}); salvaPlanner(); renderizzaTutto(); } };
 
     divAdd.appendChild(bAddObj); divAdd.appendChild(bAddSub);
@@ -249,8 +269,10 @@ function creaListaRec(arr, container, livello=2){
 renderizzaTutto();
 
 document.addEventListener('click', e => {
-  if(e.target.classList.contains('collapsible')){
-    const nextUl = e.target.nextElementSibling;
+  // Gestione click sui titoli (collapsible)
+  const target = e.target.closest('.collapsible');
+  if(target){
+    const nextUl = target.nextElementSibling;
     if(nextUl) nextUl.style.display = nextUl.style.display==='block' ? 'none' : 'block';
   }
 });
