@@ -7,6 +7,7 @@
 <link rel="icon" type="image/png" sizes="32x32" href="https://cdn-icons-png.flaticon.com/512/2675/2675848.png">
 <title>Planner Obiettivi 2026 - Zen Colorato</title>
 <style>
+/* Il tuo stile originale intatto */
 body {
   font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   background:#fdfbf5;
@@ -44,16 +45,32 @@ input[type="checkbox"] { transform: scale(1.2); margin-right:10px; }
 .add-item-btn { background:#cfd8d2; font-weight: bold; }
 .delete-item-btn { background:#f4b4b4; color: #721c24; margin-left: auto;}
 .sync-btn { position: fixed; bottom: 25px; right: 25px; width: 60px; height: 60px; border-radius: 50%; background: #4a4a4a; color: white; border: none; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.3); z-index: 10000; font-size: 26px; display: flex; align-items: center; justify-content: center; }
+
+/* Aggiunta per Login e Agenda */
+#login-screen { position: fixed; inset: 0; background: #fdfbf5; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 20001; }
+#agenda-container { background: #fff5e6; border: 1px solid #ffcc80; border-radius: 12px; padding: 15px; margin-bottom: 25px; display: none; }
+#agenda-container h3 { margin: 0 0 10px 0; font-size: 1.1rem; color: #e67e22; border:none; cursor:default; background:none; padding:0;}
 </style>
 </head>
 <body>
 
-<h1>Planner Obiettivi 2026 - Zen Colorato</h1>
+<div id="login-screen">
+    <h2 style="border:none; cursor:default;">Accesso Planner 2026</h2>
+    <input type="password" id="pass-input" placeholder="Inserisci password" style="padding:12px; border-radius:8px; border:1px solid #ccc; width: 220px; text-align: center; font-size:16px;">
+    <button onclick="checkLogin()" style="margin-top:15px; padding:12px 40px; background:#4a4a4a; color:white;">ENTRA</button>
+</div>
+
+<div id="main-content" style="display:none;">
+    <h1>Planner Obiettivi 2026 - Zen Colorato</h1>
+    <div id="agenda-container"></div>
+    <div id="planner"></div>
+</div>
+
 <button class="sync-btn" onclick="salvaSuCloud()">☁️</button>
-<div id="planner"></div>
 
 <script>
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzf2V7uR83vAiSN4kMm4IWuSokQG1p8vq9ULZ8rP9KhkJGdrZDW22iR7k0fkMWIp61vdQ/exec";
+const PASSWORD_CORRETTA = "Cyborg9001"; // <--- CAMBIALA QUI!
 
 let planner = [
   { titolo:"❤️ Salute & Corpo", colore:"salute", sottoCategorie:[
@@ -107,17 +124,53 @@ let planner = [
   ]}
 ];
 
-// Caricamento Dati
+// FUNZIONI LOGIN
+function checkLogin() {
+    const val = document.getElementById('pass-input').value;
+    if(val === PASSWORD_CORRETTA) {
+        localStorage.setItem('auth_2026', 'true');
+        document.getElementById('login-screen').style.display = 'none';
+        document.getElementById('main-content').style.display = 'block';
+        caricaDaCloud();
+    } else { alert("Password errata!"); }
+}
+
+if(localStorage.getItem('auth_2026') === 'true') {
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('main-content').style.display = 'block';
+}
+
+// FUNZIONE AGENDA
+function aggiornaAgenda() {
+    const container = document.getElementById('agenda-container');
+    let scadenze = [];
+    const cerca = (lista) => {
+        lista.forEach(c => {
+            if(c.obiettivi) c.obiettivi.forEach(o => { if(o.data) scadenze.push({...o, cat: c.titolo}); });
+            if(c.sottoCategorie) cerca(c.sottoCategorie);
+        });
+    };
+    cerca(planner);
+    if(scadenze.length > 0) {
+        container.style.display = "block";
+        container.innerHTML = "<h3>🗓️ Prossimi Appuntamenti</h3>";
+        scadenze.sort((a,b) => a.data.localeCompare(b.data)).forEach(s => {
+            container.innerHTML += `<div style="margin-bottom:8px; font-size:0.95em;"><strong>${s.data}</strong>: ${s.testo} <small style="color:#888;">(${s.cat})</small></div>`;
+        });
+    } else { container.style.display = "none"; }
+}
+
 if(localStorage.getItem('planner')) {
     try { planner = JSON.parse(localStorage.getItem('planner')); } catch(e){ console.error(e); }
 }
 
-function salvaPlanner() { localStorage.setItem('planner', JSON.stringify(planner)); }
+function salvaPlanner() { localStorage.setItem('planner', JSON.stringify(planner)); aggiornaAgenda(); }
 
 function renderizzaTutto() {
     const p = document.getElementById('planner');
     p.innerHTML = '';
     creaListaRec(planner, p);
+    aggiornaAgenda();
 }
 
 function creaListaRec(arr, container, livello=2){
@@ -126,20 +179,24 @@ function creaListaRec(arr, container, livello=2){
     h.textContent = item.titolo;
     if(livello===2 && item.colore) h.dataset.color = item.colore;
     h.classList.add('collapsible');
+    
+    // Tasto elimina categoria
+    const bDelCat = document.createElement('button');
+    bDelCat.textContent = '🗑️'; bDelCat.style.float = 'right'; bDelCat.className = 'delete-item-btn';
+    bDelCat.onclick = (e) => { e.stopPropagation(); if(confirm("Eliminare intera sezione?")){ arr.splice(i,1); salvaPlanner(); renderizzaTutto(); } };
+    h.appendChild(bDelCat);
+    
     container.appendChild(h);
 
     const ul = document.createElement('ul');
     ul.classList.add('collapsible-content');
 
     (item.obiettivi || []).forEach((obj, j) => {
-      // Conversione stringhe vecchie in oggetti
       if (typeof obj === 'string') {
           obj = { testo: obj, completato: false, nota: "", data: "", flag: false };
           item.obiettivi[j] = obj;
       }
-
       const li = document.createElement('li');
-      
       const check = document.createElement('input');
       check.type = 'checkbox';
       check.checked = obj.completato || false;
@@ -150,57 +207,39 @@ function creaListaRec(arr, container, livello=2){
       txt.textContent = obj.testo;
       li.appendChild(txt);
 
-      // Flag
       const f = document.createElement('span');
       f.className = 'flag';
       f.textContent = obj.flag ? '✅' : '🔴';
-      f.onclick = () => { obj.flag = !obj.flag; f.textContent = obj.flag ? '✅' : '🔴'; salvaPlanner(); };
+      f.onclick = () => { obj.flag = !obj.flag; salvaPlanner(); renderizzaTutto(); };
       li.appendChild(f);
 
-      // Data
-      const bD = document.createElement('button');
-      bD.textContent = '📅';
-      bD.onclick = () => { 
-          const res = prompt('Data:', obj.data || ""); 
-          if(res !== null) { obj.data = res; salvaPlanner(); renderizzaTutto(); }
-      };
+      const bD = document.createElement('button'); bD.textContent = '📅';
+      bD.onclick = () => { const res = prompt('Data:', obj.data || ""); if(res !== null) { obj.data = res; salvaPlanner(); renderizzaTutto(); } };
       li.appendChild(bD);
 
-      // Nota
-      const bN = document.createElement('button');
-      bN.textContent = '+ Nota';
-      bN.onclick = () => { 
-          const res = prompt('Nota:', obj.nota || ""); 
-          if(res !== null) { obj.nota = res; salvaPlanner(); renderizzaTutto(); }
-      };
+      const bN = document.createElement('button'); bN.textContent = '+ Nota';
+      bN.onclick = () => { const res = prompt('Nota:', obj.nota || ""); if(res !== null) { obj.nota = res; salvaPlanner(); renderizzaTutto(); } };
       li.appendChild(bN);
 
-      // Delete
-      const bDel = document.createElement('button');
-      bDel.textContent = '🗑️';
-      bDel.className = 'delete-item-btn';
+      const bDel = document.createElement('button'); bDel.textContent = 'X'; bDel.className = 'delete-item-btn';
       bDel.onclick = () => { item.obiettivi.splice(j, 1); salvaPlanner(); renderizzaTutto(); };
       li.appendChild(bDel);
 
-      if(obj.data) {
-          const sD = document.createElement('span'); sD.className = 'date';
-          sD.textContent = ' ⏳ ' + obj.data; li.appendChild(sD);
-      }
-      if(obj.nota) {
-          const sN = document.createElement('div'); sN.className = 'note';
-          sN.textContent = '📝 Note: ' + obj.nota; li.appendChild(sN);
-      }
+      if(obj.data) { const sD = document.createElement('span'); sD.className = 'date'; sD.textContent = ' ⏳ ' + obj.data; li.appendChild(sD); }
+      if(obj.nota) { const sN = document.createElement('div'); sN.className = 'note'; sN.textContent = '📝 ' + obj.nota; li.appendChild(sN); }
       ul.appendChild(li);
     });
 
-    const bAdd = document.createElement('button');
-    bAdd.textContent = '+ Aggiungi';
-    bAdd.className = 'add-item-btn';
-    bAdd.onclick = () => {
-        const n = prompt('Cosa aggiungere?');
-        if(n) { item.obiettivi.push({testo: n, completato: false, nota:"", data:"", flag:false}); salvaPlanner(); renderizzaTutto(); }
-    };
-    ul.appendChild(bAdd);
+    // Sdoppiamento tasto aggiungi
+    const divAdd = document.createElement('div');
+    const bAddObj = document.createElement('button'); bAddObj.textContent = '+ Obiettivo'; bAddObj.className = 'add-item-btn';
+    bAddObj.onclick = () => { const n = prompt('Nuovo obiettivo:'); if(n) { item.obiettivi.push({testo: n, completato: false, nota:"", data:"", flag:false}); salvaPlanner(); renderizzaTutto(); } };
+    
+    const bAddSub = document.createElement('button'); bAddSub.textContent = '+ Sotto-sezione'; bAddSub.className = 'add-item-btn';
+    bAddSub.onclick = () => { const n = prompt('Nome sezione:'); if(n) { item.sottoCategorie = item.sottoCategorie || []; item.sottoCategorie.push({titolo: n, obiettivi: [], sottoCategorie: []}); salvaPlanner(); renderizzaTutto(); } };
+
+    divAdd.appendChild(bAddObj); divAdd.appendChild(bAddSub);
+    ul.appendChild(divAdd);
 
     if(item.sottoCategorie) creaListaRec(item.sottoCategorie, ul, livello+1);
     container.appendChild(ul);
@@ -217,12 +256,11 @@ document.addEventListener('click', e => {
 });
 
 async function salvaSuCloud() {
-    const btn = document.querySelector('.sync-btn');
-    btn.textContent = "⏳";
+    const btn = document.querySelector('.sync-btn'); btn.textContent = "⏳";
     try {
         await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(planner) });
-        alert("✅ Sincronizzato!");
-    } catch (e) { alert("❌ Errore"); }
+        alert("✅ Sincronizzato con il Cloud!");
+    } catch (e) { alert("❌ Errore sincronizzazione"); }
     btn.textContent = "☁️";
 }
 
@@ -232,12 +270,11 @@ async function caricaDaCloud() {
         const text = await response.text();
         if (text && text.length > 50) {
             planner = JSON.parse(text);
-            salvaPlanner();
-            renderizzaTutto();
+            salvaPlanner(); renderizzaTutto();
         }
-    } catch (e) { console.log("Cloud vuoto"); }
+    } catch (e) { console.log("Cloud vuoto o errore"); }
 }
-caricaDaCloud();
+if(localStorage.getItem('auth_2026') === 'true') caricaDaCloud();
 </script>
 </body>
 </html>
